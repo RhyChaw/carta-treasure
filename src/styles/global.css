@@ -80,6 +80,10 @@ input {
   padding: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card {

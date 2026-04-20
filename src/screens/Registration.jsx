@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
@@ -13,10 +13,9 @@ export default function Registration() {
   const [showRejoin, setShowRejoin] = useState(false)
   const [existingPlayers, setExistingPlayers] = useState([])
 
-  if (player) {
-    navigate('/game')
-    return null
-  }
+  useEffect(() => {
+    if (player) navigate('/game')
+  }, [player, navigate])
 
   async function handleRegister(e) {
     e.preventDefault()

@@ -69,7 +69,7 @@ export default function Scanner() {
   function handleManualSubmit(e) {
     e.preventDefault()
     const raw = manualCode.trim().toUpperCase()
-    const roomId = parseQrCode(`JUNGLE_HUNT_${raw}`) ?? parseQrCode(raw)
+    const roomId = parseQrCode(raw) ?? parseQrCode(`JUNGLE_HUNT_${raw}`)
     if (roomId) {
       handleResult(roomId)
     } else {

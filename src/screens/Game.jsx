@@ -11,7 +11,7 @@ import MapView from '../components/MapView'
 
 export default function Game() {
   const navigate = useNavigate()
-  const { player, updateStep, logout } = usePlayer()
+  const { player, updateStep, logout, completeGame } = usePlayer()
   const [passphrase, setPassphrase] = useState('')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
@@ -74,7 +74,8 @@ export default function Game() {
           is_first_place: isFirst,
           current_step: nextStep,
         }).eq('id', player.id)
-        updateStep(nextStep)
+        const completedAt = new Date().toISOString()
+        completeGame(completedAt, isFirst)
         navigate('/victory')
         return
       }

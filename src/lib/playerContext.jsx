@@ -32,8 +32,12 @@ export function PlayerProvider({ children }) {
     setPlayer(prev => ({ ...prev, current_step: step }))
   }
 
+  function completeGame(completedAt, isFirstPlace) {
+    setPlayer(prev => ({ ...prev, completed_at: completedAt, is_first_place: isFirstPlace }))
+  }
+
   return (
-    <PlayerContext.Provider value={{ player, login, logout, updateStep }}>
+    <PlayerContext.Provider value={{ player, login, logout, updateStep, completeGame }}>
       {children}
     </PlayerContext.Provider>
   )
