@@ -11,7 +11,7 @@ import MapView from '../components/MapView'
 
 export default function Game() {
   const navigate = useNavigate()
-  const { player, updateStep, logout, completeGame } = usePlayer()
+  const { player, updateStep, completeGame } = usePlayer()
   const [passphrase, setPassphrase] = useState('')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
@@ -100,19 +100,6 @@ export default function Game() {
   return (
     <div className="screen">
       <Toast {...toast} />
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Explorer
-          </p>
-          <p style={{ fontWeight: 'bold', color: 'var(--green-glow)' }}>{player.name}</p>
-        </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="btn-ghost" onClick={() => navigate('/leaderboard')}>Board</button>
-          <button className="btn-ghost" onClick={() => { logout(); navigate('/') }}>⤶</button>
-        </div>
-      </div>
 
       <ProgressBar current={player.current_step} total={CHECKPOINTS.length} />
 

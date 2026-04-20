@@ -14,7 +14,7 @@ export default function Registration() {
   const [existingPlayers, setExistingPlayers] = useState([])
 
   useEffect(() => {
-    if (player) navigate('/game')
+    if (player) navigate('/home')
   }, [player, navigate])
 
   async function handleRegister(e) {
@@ -30,7 +30,7 @@ export default function Registration() {
         .single()
       if (dbError) throw dbError
       login(data)
-      navigate('/game')
+      navigate('/home')
     } catch (err) {
       setError('Something went wrong. Try again.')
       console.error(err)
@@ -53,7 +53,7 @@ export default function Registration() {
 
   function pickExistingPlayer(p) {
     login(p)
-    navigate('/game')
+    navigate('/home')
   }
 
   return (
