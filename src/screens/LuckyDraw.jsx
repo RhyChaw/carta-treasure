@@ -8,22 +8,34 @@ const SPIN_DURATION_MS = 600   // how long each slot spins before landing
 const SLOT_INTERVAL_MS = 1200  // gap between each slot landing
 
 function SlotReel({ eligibleNames, winner, spinning, landed }) {
-  const intervalRef = useRef(null)
+  const timeoutRef = useRef(null)
   const [displayName, setDisplayName] = useState(eligibleNames[0] ?? '')
 
   useEffect(() => {
-    if (spinning && !landed) {
-      let i = 0
-      intervalRef.current = setInterval(() => {
-        i = (i + 1) % eligibleNames.length
-        setDisplayName(eligibleNames[i])
-      }, 80)
-    }
     if (landed) {
-      clearInterval(intervalRef.current)
+      clearTimeout(timeoutRef.current)
       setDisplayName(winner)
+      return
     }
-    return () => clearInterval(intervalRef.current)
+
+    if (!spinning) return
+
+    // Deceleration: start fast, slow down over ~30 ticks
+    let tick = 0
+    let i = 0
+
+    function step() {
+      i = (i + 1) % eligibleNames.length
+      setDisplayName(eligibleNames[i])
+      tick++
+      // Interval grows from 80ms → ~400ms over 25 ticks, then stays at 400ms
+      const delay = Math.min(80 + tick * 13, 400)
+      timeoutRef.current = setTimeout(step, delay)
+    }
+
+    timeoutRef.current = setTimeout(step, 80)
+
+    return () => clearTimeout(timeoutRef.current)
   }, [spinning, landed, winner, eligibleNames])
 
   return (
