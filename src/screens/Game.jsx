@@ -7,7 +7,6 @@ import { CHECKPOINTS, getCheckpoint, validatePassphrase } from '../lib/checkpoin
 import ProgressBar from '../components/ProgressBar'
 import RiddleCard from '../components/RiddleCard'
 import Toast from '../components/Toast'
-import MapView from '../components/MapView'
 
 export default function Game() {
   const navigate = useNavigate()
@@ -16,7 +15,6 @@ export default function Game() {
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
   const [scanResult, setScanResult] = useState(null)
-  const [mapOpen, setMapOpen] = useState(false)
 
   useEffect(() => {
     if (!player) navigate('/')
@@ -133,17 +131,6 @@ export default function Game() {
           </form>
         </motion.div>
       )}
-
-      <div>
-        <button
-          className="btn-ghost"
-          onClick={() => setMapOpen(o => !o)}
-          style={{ width: '100%', textAlign: 'left', padding: '0.5rem 0' }}
-        >
-          {mapOpen ? '▲ Hide Map' : '▼ Show Map'}
-        </button>
-        {mapOpen && <MapView completedRooms={completedCheckpoints.map(c => c.roomId)} currentRoom={currentCheckpoint?.roomId} />}
-      </div>
 
       {completedCheckpoints.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
