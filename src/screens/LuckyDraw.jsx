@@ -113,6 +113,8 @@ export default function LuckyDraw() {
 
   function handleDraw() {
     if (drawn || drawing || eligible.length === 0) return
+    drawTimeoutsRef.current.forEach(clearTimeout)
+    drawTimeoutsRef.current = []
     const picked = pickWinners(eligible, DRAW_COUNT)
     setWinners(picked)
     setDrawing(true)
@@ -145,12 +147,12 @@ export default function LuckyDraw() {
         {fetchError && <p className="text-error" style={{ fontSize: '0.875rem' }}>{fetchError}</p>}
       </div>
 
-      {/* 5 slots */}
+      {/* slot reels */}
       <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Winners
         </p>
-        {Array.from({ length: loading ? DRAW_COUNT : Math.min(DRAW_COUNT, Math.max(eligible.length, 1)) }).map((_, i) => (
+        {Array.from({ length: loading ? DRAW_COUNT : Math.min(DRAW_COUNT, eligible.length) }).map((_, i) => (
           <SlotReel
             key={i}
             eligibleNames={eligibleNames.length > 0 ? eligibleNames : ['—']}
