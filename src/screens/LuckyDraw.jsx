@@ -1,1 +1,209 @@
-export default function LuckyDraw() { return <div className="screen">Lucky Draw</div> }
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { supabase } from '../lib/supabase'
+import { pickWinners } from '../lib/luckyDraw'
+
+const DRAW_COUNT = 5
+const SPIN_DURATION_MS = 600   // how long each slot spins before landing
+const SLOT_INTERVAL_MS = 1200  // gap between each slot landing
+
+function SlotReel({ eligibleNames, winner, spinning, landed }) {
+  const intervalRef = useRef(null)
+  const [displayName, setDisplayName] = useState(eligibleNames[0] ?? '')
+
+  useEffect(() => {
+    if (spinning && !landed) {
+      let i = 0
+      intervalRef.current = setInterval(() => {
+        i = (i + 1) % eligibleNames.length
+        setDisplayName(eligibleNames[i])
+      }, 80)
+    }
+    if (landed) {
+      clearInterval(intervalRef.current)
+      setDisplayName(winner)
+    }
+    return () => clearInterval(intervalRef.current)
+  }, [spinning, landed, winner, eligibleNames])
+
+  return (
+    <motion.div
+      animate={landed ? { scale: [1, 1.08, 1] } : {}}
+      transition={{ duration: 0.3 }}
+      style={{
+        background: landed ? 'var(--green-light)' : 'var(--bg)',
+        border: `2px solid ${landed ? 'var(--green-glow)' : 'var(--border)'}`,
+        borderRadius: 8,
+        padding: '0.75rem 1rem',
+        textAlign: 'center',
+        fontSize: '1rem',
+        fontWeight: landed ? 'bold' : 'normal',
+        color: landed ? 'var(--green-glow)' : 'var(--text-muted)',
+        minHeight: 48,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        letterSpacing: '0.03em',
+        transition: 'background 0.2s, border-color 0.2s',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {spinning || landed ? displayName : '· · ·'}
+    </motion.div>
+  )
+}
+
+export default function LuckyDraw() {
+  const [eligible, setEligible] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [pin, setPin] = useState('')
+  const [pinError, setPinError] = useState('')
+  const [unlocked, setUnlocked] = useState(false)
+  const [drawing, setDrawing] = useState(false)
+  const [winners, setWinners] = useState([])
+  const [landedCount, setLandedCount] = useState(0)
+  const [drawn, setDrawn] = useState(false)
+
+  const CORRECT_PIN = import.meta.env.VITE_LUCKY_DRAW_PIN ?? '1234'
+
+  useEffect(() => {
+    async function fetchEligible() {
+      const { data } = await supabase
+        .from('players')
+        .select('id, name')
+        .not('completed_at', 'is', null)
+        .eq('is_first_place', false)
+      setEligible(data ?? [])
+      setLoading(false)
+    }
+    fetchEligible()
+  }, [])
+
+  function handleUnlock(e) {
+    e.preventDefault()
+    if (pin === CORRECT_PIN) {
+      setUnlocked(true)
+      setPinError('')
+    } else {
+      setPinError('Wrong PIN. Try again.')
+      setPin('')
+    }
+  }
+
+  function handleDraw() {
+    if (drawn || drawing || eligible.length === 0) return
+    const picked = pickWinners(eligible, DRAW_COUNT)
+    setWinners(picked)
+    setDrawing(true)
+    setLandedCount(0)
+
+    picked.forEach((_, i) => {
+      setTimeout(() => {
+        setLandedCount(prev => prev + 1)
+        if (i === picked.length - 1) {
+          setDrawing(false)
+          setDrawn(true)
+        }
+      }, SPIN_DURATION_MS + i * SLOT_INTERVAL_MS)
+    })
+  }
+
+  const eligibleNames = eligible.map(p => p.name)
+  const isSpinning = drawing || landedCount > 0
+
+  return (
+    <div className="screen">
+      <div>
+        <h1 style={{ fontSize: '1.1rem' }}>Lucky Draw 🎲</h1>
+        <p className="text-muted" style={{ fontSize: '0.8rem' }}>
+          {loading
+            ? 'Loading...'
+            : `${eligible.length} eligible explorer${eligible.length !== 1 ? 's' : ''}`}
+        </p>
+      </div>
+
+      {/* 5 slots */}
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Winners
+        </p>
+        {Array.from({ length: DRAW_COUNT }).map((_, i) => (
+          <SlotReel
+            key={i}
+            eligibleNames={eligibleNames.length > 0 ? eligibleNames : ['—']}
+            winner={winners[i]?.name ?? ''}
+            spinning={isSpinning}
+            landed={landedCount > i}
+          />
+        ))}
+      </div>
+
+      {/* PIN or Draw button */}
+      {!unlocked ? (
+        <form onSubmit={handleUnlock} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <input
+            className="input-field"
+            type="password"
+            placeholder="Organizer PIN..."
+            value={pin}
+            onChange={e => setPin(e.target.value)}
+            maxLength={8}
+          />
+          {pinError && <p className="text-error" style={{ fontSize: '0.875rem' }}>{pinError}</p>}
+          <button type="submit" className="btn-secondary">Unlock Draw</button>
+        </form>
+      ) : (
+        <button
+          className="btn-primary"
+          onClick={handleDraw}
+          disabled={drawing || drawn || eligible.length === 0}
+        >
+          {drawn ? 'Draw Complete 🎉' : drawing ? 'Drawing...' : `Draw ${Math.min(DRAW_COUNT, eligible.length)} Winners`}
+        </button>
+      )}
+
+      {/* Eligible list */}
+      {eligible.length > 0 && (
+        <div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+            Eligible Explorers
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+            {eligible.map(p => {
+              const isWinner = drawn && winners.some(w => w.id === p.id)
+              return (
+                <span
+                  key={p.id}
+                  style={{
+                    background: isWinner ? 'var(--green-light)' : 'var(--bg-card)',
+                    border: `1px solid ${isWinner ? 'var(--green-glow)' : 'var(--border)'}`,
+                    color: isWinner ? 'var(--green-glow)' : 'var(--text-muted)',
+                    borderRadius: 20,
+                    padding: '0.25rem 0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: isWinner ? 'bold' : 'normal',
+                    opacity: drawn && !isWinner ? 0.45 : 1,
+                    transition: 'all 0.3s',
+                  }}
+                >
+                  {isWinner && '✓ '}{p.name}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {eligible.length === 0 && !loading && (
+        <div className="card" style={{ textAlign: 'center' }}>
+          <p style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            "No explorers in the draw yet... the jungle awaits its finishers."
+            <br />— Fairy
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
