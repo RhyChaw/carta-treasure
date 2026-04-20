@@ -1,77 +1,119 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS } from '../lib/checkpoints'
 
 const DIFFICULTY = ['⭐','⭐⭐','⭐⭐⭐','⭐','⭐⭐','⭐⭐⭐','⭐','⭐⭐','⭐⭐⭐','🔥']
 
-function CheckpointRow({ checkpoint, state, onTap }) {
+function CheckpointRow({ checkpoint, state, onTap, expanded }) {
   const isDone    = state === 'done'
   const isCurrent = state === 'current'
   const isLocked  = state === 'locked'
 
   return (
-    <motion.button
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: checkpoint.index * 0.04 }}
-      onClick={isLocked ? undefined : onTap}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.875rem',
-        width: '100%',
-        padding: '0.875rem 1rem',
-        background: isCurrent ? 'var(--green-light)' : 'var(--bg-card)',
-        border: `1px solid ${isCurrent ? 'var(--border-bright)' : 'var(--border)'}`,
-        borderLeft: `4px solid ${isDone ? 'var(--green-glow)' : isCurrent ? 'var(--gold)' : 'var(--border)'}`,
-        borderRadius: 10,
-        cursor: isLocked ? 'default' : 'pointer',
-        opacity: isLocked ? 0.55 : 1,
-        textAlign: 'left',
-        transition: 'box-shadow 0.15s',
-      }}
-    >
-      <span style={{
-        minWidth: 28,
-        height: 28,
-        borderRadius: '50%',
-        background: isDone ? 'var(--green-glow)' : isCurrent ? 'var(--gold)' : 'var(--border)',
-        color: isDone || isCurrent ? '#fff' : 'var(--text-muted)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '0.75rem',
-        fontWeight: 'bold',
-        animation: isCurrent ? 'pulse-glow 2s ease-in-out infinite' : 'none',
-        flexShrink: 0,
-      }}>
-        {isDone ? '✓' : checkpoint.index + 1}
-      </span>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontWeight: 'bold', fontSize: '0.9rem', color: isLocked ? 'var(--text-muted)' : 'var(--text)' }}>
-          {isLocked ? '???' : checkpoint.roomId}
-        </p>
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          {isDone ? 'Completed' : isCurrent ? 'Your current quest' : 'Locked'}
-        </p>
-      </div>
-
-      {!isLocked && (
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-          {DIFFICULTY[checkpoint.index]}
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <motion.button
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: checkpoint.index * 0.04 }}
+        onClick={isLocked ? undefined : onTap}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.875rem',
+          width: '100%',
+          padding: '0.875rem 1rem',
+          background: isCurrent ? 'var(--green-light)' : 'var(--bg-card)',
+          border: `1px solid ${isCurrent ? 'var(--border-bright)' : 'var(--border)'}`,
+          borderLeft: `4px solid ${isDone ? 'var(--green-glow)' : isCurrent ? 'var(--gold)' : 'var(--border)'}`,
+          borderRadius: expanded ? '10px 10px 0 0' : 10,
+          borderBottom: expanded ? 'none' : undefined,
+          cursor: isLocked ? 'default' : 'pointer',
+          opacity: isLocked ? 0.55 : 1,
+          textAlign: 'left',
+          transition: 'box-shadow 0.15s',
+        }}
+      >
+        <span style={{
+          minWidth: 28,
+          height: 28,
+          borderRadius: '50%',
+          background: isDone ? 'var(--green-glow)' : isCurrent ? 'var(--gold)' : 'var(--border)',
+          color: isDone || isCurrent ? '#fff' : 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          animation: isCurrent ? 'pulse-glow 2s ease-in-out infinite' : 'none',
+          flexShrink: 0,
+        }}>
+          {isDone ? '✓' : checkpoint.index + 1}
         </span>
-      )}
 
-      {isLocked && <span style={{ fontSize: '1rem', color: 'var(--text-muted)', flexShrink: 0 }}>🔒</span>}
-    </motion.button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontWeight: 'bold', fontSize: '0.9rem', color: isLocked ? 'var(--text-muted)' : 'var(--text)' }}>
+            {isLocked ? '???' : checkpoint.roomId}
+          </p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            {isDone ? 'Completed · tap to review' : isCurrent ? 'Your current quest' : 'Locked'}
+          </p>
+        </div>
+
+        {!isLocked && (
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>
+            {DIFFICULTY[checkpoint.index]}
+          </span>
+        )}
+
+        {isLocked && <span style={{ fontSize: '1rem', color: 'var(--text-muted)', flexShrink: 0 }}>🔒</span>}
+      </motion.button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              background: 'var(--green-light)',
+              border: '1px solid var(--border-bright)',
+              borderTop: 'none',
+              borderRadius: '0 0 10px 10px',
+              padding: '0.75rem 1rem',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <span style={{
+                background: 'var(--green-glow)',
+                color: '#fff',
+                fontSize: '0.7rem',
+                fontWeight: 'bold',
+                padding: '0.15rem 0.5rem',
+                borderRadius: 4,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}>
+                Completed ✓
+              </span>
+            </div>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.6 }}>
+              {checkpoint.riddle}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
 export default function CheckpointsList() {
   const navigate = useNavigate()
   const { player } = usePlayer()
+  const [expandedIndex, setExpandedIndex] = useState(null)
 
   if (!player) return null
 
@@ -81,8 +123,11 @@ export default function CheckpointsList() {
     return 'locked'
   }
 
-  function handleTap(state) {
-    if (state === 'current') navigate('/game')
+  function handleTap(checkpoint, state) {
+    if (state === 'current') { navigate('/game'); return }
+    if (state === 'done') {
+      setExpandedIndex(prev => prev === checkpoint.index ? null : checkpoint.index)
+    }
   }
 
   return (
@@ -100,7 +145,8 @@ export default function CheckpointsList() {
             key={cp.index}
             checkpoint={cp}
             state={getState(cp.index)}
-            onTap={() => handleTap(getState(cp.index))}
+            onTap={() => handleTap(cp, getState(cp.index))}
+            expanded={expandedIndex === cp.index}
           />
         ))}
       </div>

@@ -219,7 +219,7 @@ export default function LuckyDraw() {
         </div>
       )}
 
-      {eligible.length === 0 && !loading && (
+      {eligible.length === 0 && !loading && !fetchError && (
         <div className="card" style={{ textAlign: 'center' }}>
           <p style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             "No explorers in the draw yet... the jungle awaits its finishers."
