@@ -7,4 +7,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Missing Supabase env vars. Create a .env file from .env.example.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+function getPlayerId() {
+  try {
+    const saved = sessionStorage.getItem('jungle_player')
+    return saved ? JSON.parse(saved)?.id ?? '' : ''
+  } catch {
+    return ''
+  }
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (url, options = {}) => {
+      const headers = new Headers(options.headers)
+      const playerId = getPlayerId()
+      if (playerId) headers.set('x-player-id', playerId)
+      return fetch(url, { ...options, headers })
+    },
+  },
+})
