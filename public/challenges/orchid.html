@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Checkpoint 4 — Office Jungle Hunt</title>
+  <style>
+    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px;display:flex;flex-direction:column;gap:.75rem}
+    h1{color:var(--green);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase}
+    h2{color:var(--gold);font-size:1rem}
+    p{line-height:1.6;font-size:.95rem}
+    .fairy{width:80px}
+    .muted{color:var(--muted);font-size:.875rem;font-style:italic}
+    .passphrase-box{background:#071e12;border:2px solid var(--green);border-radius:8px;padding:1rem 1.5rem;text-align:center}
+    .passphrase-box span{font-size:1.5rem;font-weight:bold;color:var(--green);letter-spacing:.1em}
+  </style>
+</head>
+<body>
+  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <div class="card">
+    <h1>Checkpoint 4 — Rebus Puzzle</h1>
+    <p class="muted">"Pictures hold ancient jungle wisdom. Decode them, explorer!"</p>
+  </div>
+  <div class="card">
+    <h2>Solve the Rebus</h2>
+    <p>🖼️ <em style="color:var(--gold)">[ORGANIZER: Add your rebus puzzle images or descriptions here. Example: 👁️ + 🏝️ = ISLAND]</em></p>
+    <p class="muted">The answer to the final rebus is your passphrase.</p>
+    <div class="passphrase-box">
+      <p class="muted" style="margin-bottom:.5rem">Your passphrase:</p>
+      <span>PLACEHOLDER_ORCHID</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Checkpoint 8 — Office Jungle Hunt</title>
+  <style>
+    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35;--error:#ef4444}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px;display:flex;flex-direction:column;gap:.75rem}
+    h1{color:var(--green);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase}
+    h2{color:var(--gold);font-size:1rem}
+    p{line-height:1.6;font-size:.95rem}
+    .fairy{width:80px}
+    .muted{color:var(--muted);font-size:.875rem;font-style:italic}
+    input{background:#071e12;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none}
+    input:focus{border-color:var(--green)}
+    button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
+    .error{color:var(--error);font-size:.875rem}
+    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+  </style>
+</head>
+<body>
+  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <div class="card">
+    <h1>Checkpoint 8 — CARTA Word Challenge</h1>
+    <p class="muted">"The fairy needs you to prove your linguistic powers, explorer!"</p>
+  </div>
+  <div class="card">
+    <h2>Letters: C, A, R, T, A</h2>
+    <p>Using ONLY the letters <strong style="color:var(--gold)">C, A, R, T, A</strong> — how many valid English words of 3+ letters can you form?</p>
+    <p class="muted">(You have two A's. CARTA counts. No proper nouns except CARTA.)</p>
+    <p class="muted">Word bank to check yourself: ARC, ART, CAR, CAT, RAT, TAR, ACT, CART, CARAT, CARTA...</p>
+    <input id="viol" placeholder="Enter the count as a number..." type="number" min="0" max="30" />
+    <button onclick="checkViolet()">Check Answer</button>
+    <p id="viol-result"></p>
+  </div>
+  <script>
+    const ANSWER = 'PLACEHOLDER_VIOLET_NUMBER';
+    function checkViolet() {
+      const val = document.getElementById('viol').value.trim();
+      const el = document.getElementById('viol-result');
+      if (val === ANSWER) { el.className='success'; el.textContent='✓ The fairy claps! Passphrase: ' + ANSWER; }
+      else { el.className='error'; el.textContent="Not quite the right count. Check your word list!"; }
+    }
+  </script>
+</body>
+</html>

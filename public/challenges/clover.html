@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Checkpoint 1 — Office Jungle Hunt</title>
+  <style>
+    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px}
+    h1{color:var(--green);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+    h2{color:var(--gold);font-size:1rem;margin-bottom:.75rem}
+    p{line-height:1.6;font-size:.95rem;margin-bottom:.5rem}
+    .fairy{width:80px}
+    .muted{color:var(--muted);font-size:.875rem;font-style:italic}
+    .passphrase-box{background:#071e12;border:2px solid var(--green);border-radius:8px;padding:1rem 1.5rem;text-align:center;margin-top:.75rem}
+    .passphrase-box span{font-size:1.5rem;font-weight:bold;color:var(--green);letter-spacing:.1em}
+    button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;letter-spacing:.06em;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase;margin-top:.5rem}
+  </style>
+</head>
+<body>
+  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <div class="card">
+    <h1>Checkpoint 1 — Emoji Decode</h1>
+    <p class="muted">"Brave explorer! Decode these jungle equations. The last answer is your key..."</p>
+  </div>
+  <div class="card">
+    <h2>Decode the Emoji Equations</h2>
+    <p>🌳 + 🔥 = <strong>ASH</strong> <span class="muted">(example — solved)</span></p>
+    <p>🌸 + 🐝 = <strong>HONEY</strong> <span class="muted">(example — solved)</span></p>
+    <hr style="border:none;border-top:1px solid var(--border);margin:.75rem 0" />
+    <p style="font-size:1.1rem">🍀 + 4️⃣ = <strong>?</strong></p>
+    <p class="muted">What does a four-leaf clover represent?</p>
+  </div>
+  <div class="card">
+    <button onclick="document.getElementById('ans').style.display='block';this.style.display='none'">Reveal Answer</button>
+    <div id="ans" style="display:none">
+      <div class="passphrase-box">
+        <p class="muted" style="margin-bottom:.5rem">Your passphrase:</p>
+        <span>LUCK</span>
+      </div>
+      <p class="muted" style="margin-top:.75rem;text-align:center">Type this into the app to clear Checkpoint 1!</p>
+    </div>
+  </div>
+</body>
+</html>
