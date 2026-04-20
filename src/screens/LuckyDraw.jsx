@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { supabase } from '../lib/supabase'
 import { pickWinners } from '../lib/luckyDraw'
@@ -6,6 +6,7 @@ import { pickWinners } from '../lib/luckyDraw'
 const DRAW_COUNT = 5
 const SPIN_DURATION_MS = 600   // how long each slot spins before landing
 const SLOT_INTERVAL_MS = 1200  // gap between each slot landing
+const CORRECT_PIN = import.meta.env.VITE_LUCKY_DRAW_PIN ?? '1234'
 
 function SlotReel({ eligibleNames, winner, spinning, landed }) {
   const timeoutRef = useRef(null)
@@ -77,16 +78,22 @@ export default function LuckyDraw() {
   const [winners, setWinners] = useState([])
   const [landedCount, setLandedCount] = useState(0)
   const [drawn, setDrawn] = useState(false)
+  const [fetchError, setFetchError] = useState('')
 
-  const CORRECT_PIN = import.meta.env.VITE_LUCKY_DRAW_PIN ?? '1234'
+  const drawTimeoutsRef = useRef([])
+
+  useEffect(() => {
+    return () => drawTimeoutsRef.current.forEach(clearTimeout)
+  }, [])
 
   useEffect(() => {
     async function fetchEligible() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('players')
         .select('id, name')
         .not('completed_at', 'is', null)
         .eq('is_first_place', false)
+      if (error) setFetchError('Failed to load players. Check your connection.')
       setEligible(data ?? [])
       setLoading(false)
     }
@@ -112,17 +119,18 @@ export default function LuckyDraw() {
     setLandedCount(0)
 
     picked.forEach((_, i) => {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         setLandedCount(prev => prev + 1)
         if (i === picked.length - 1) {
           setDrawing(false)
           setDrawn(true)
         }
       }, SPIN_DURATION_MS + i * SLOT_INTERVAL_MS)
+      drawTimeoutsRef.current.push(id)
     })
   }
 
-  const eligibleNames = eligible.map(p => p.name)
+  const eligibleNames = useMemo(() => eligible.map(p => p.name).filter(Boolean), [eligible])
   const isSpinning = drawing || landedCount > 0
 
   return (
@@ -134,6 +142,7 @@ export default function LuckyDraw() {
             ? 'Loading...'
             : `${eligible.length} eligible explorer${eligible.length !== 1 ? 's' : ''}`}
         </p>
+        {fetchError && <p className="text-error" style={{ fontSize: '0.875rem' }}>{fetchError}</p>}
       </div>
 
       {/* 5 slots */}
@@ -141,7 +150,7 @@ export default function LuckyDraw() {
         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Winners
         </p>
-        {Array.from({ length: DRAW_COUNT }).map((_, i) => (
+        {Array.from({ length: loading ? DRAW_COUNT : Math.min(DRAW_COUNT, Math.max(eligible.length, 1)) }).map((_, i) => (
           <SlotReel
             key={i}
             eligibleNames={eligibleNames.length > 0 ? eligibleNames : ['—']}
