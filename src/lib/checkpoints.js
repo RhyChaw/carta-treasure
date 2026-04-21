@@ -10,7 +10,7 @@ export const CHECKPOINTS = [
   {
     index: 1,
     roomId: 'ASH',
-    passphrase: 'PLACEHOLDER_ASH',
+    passphrase: 'LIBRARY',
     riddle: "From the ashes of the old jungle, a mighty chamber arose. It watches over the training grounds where warriors test their strength. Seek the largest room near the northern fighting pit.",
     hint: "Find the large room on the east side, near the gym.",
     challengeUrl: '/challenges/ash.html',

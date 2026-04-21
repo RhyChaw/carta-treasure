@@ -21,6 +21,7 @@
     .success{color:var(--green);font-weight:bold}
     .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
     .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
+    .challenge-img{width:100%;border-radius:8px;border:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -31,8 +32,8 @@
   </div>
   <div class="card">
     <h2>Where in the Office is This?</h2>
-    <p>🖼️ <em style="color:var(--gold)">[ORGANIZER: Replace this text with a zoomed-in photo or description of a recognizable office spot]</em></p>
-    <p class="muted">Type the name of the location or room shown.</p>
+    <img class="challenge-img" src="/assets/challenge2.png" alt="Office location" />
+    <p class="muted">Type the name of the room or location shown.</p>
   </div>
   <div class="card" id="answer-card">
     <p class="muted">Got it? Enter your answer:</p>
@@ -43,7 +44,7 @@
     <div id="tries-list"></div>
   </div>
   <script>
-    const H='fe46ee1052b165b454410d7f5458703fc85eb8c45696bc8869ce2e91156bf911'
+    const H='d77982267d9699c2a57bcab5bb975a1935f6427002f52fd4569762fd72db3a94'
     const tries=[]
     async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
     async function check(){
