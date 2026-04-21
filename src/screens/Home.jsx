@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Crown, Leaf, Map, Trophy, Dices } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint } from '../lib/checkpoints'
 import ProgressBar from '../components/ProgressBar'
@@ -8,6 +10,23 @@ import ProgressBar from '../components/ProgressBar'
 export default function Home() {
   const navigate = useNavigate()
   const { player } = usePlayer()
+  const [rank, setRank] = useState(null)
+
+  useEffect(() => {
+    if (!player) return
+    async function fetchRank() {
+      const { data } = await supabase
+        .from('players')
+        .select('id, current_step, completed_at, created_at')
+        .order('current_step', { ascending: false })
+        .order('completed_at', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true })
+      if (!data) return
+      const pos = data.findIndex(p => p.id === player.id)
+      if (pos !== -1) setRank(pos + 1)
+    }
+    fetchRank()
+  }, [player])
 
   if (!player) return null
 
@@ -24,7 +43,7 @@ export default function Home() {
           animate={{ y: [0, -6, 0] }}
           transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
         />
-        <div>
+        <div style={{ flex: 1 }}>
           <h1 style={{ fontSize: '1.1rem' }}>
             {isComplete ? 'Hunt Complete!' : 'Lost in the Jungle'}
           </h1>
@@ -32,6 +51,26 @@ export default function Home() {
             Welcome back, <strong style={{ color: 'var(--text)' }}>{player.name}</strong>
           </p>
         </div>
+        {rank !== null && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.1rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: 10,
+            padding: '0.4rem 0.75rem',
+            minWidth: 52,
+          }}>
+            <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: rank <= 3 ? 'var(--gold)' : 'var(--text)', lineHeight: 1 }}>
+              #{rank}
+            </span>
+            <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              rank
+            </span>
+          </div>
+        )}
       </div>
 
       <ProgressBar current={Math.min(player.current_step, CHECKPOINTS.length)} total={CHECKPOINTS.length} />
