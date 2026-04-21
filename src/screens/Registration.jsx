@@ -4,15 +4,26 @@ import { motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 export default function Registration() {
   const navigate = useNavigate()
   const { login, player } = usePlayer()
-  const [name, setName] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [showRejoin, setShowRejoin] = useState(false)
-  const [existingPlayers, setExistingPlayers] = useState([])
   const skipOnboardingRef = useRef(false)
+
+  const [name, setName]         = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState('')
+
+  const [showRejoin, setShowRejoin]           = useState(false)
+  const [existingPlayers, setExistingPlayers] = useState([])
+  const [selectedPlayer, setSelectedPlayer]   = useState(null)
+  const [rejoinPassword, setRejoinPassword]   = useState('')
+  const [passwordError, setPasswordError]     = useState('')
 
   useEffect(() => {
     if (!player) return
@@ -25,18 +36,18 @@ export default function Registration() {
 
   async function handleRegister(e) {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || !password) return
     setLoading(true)
     setError('')
     try {
+      const password_hash = await sha256(password)
       const { data, error: dbError } = await supabase
         .from('players')
-        .insert({ name: name.trim() })
+        .insert({ name: name.trim(), password_hash })
         .select()
         .single()
       if (dbError) throw dbError
       login(data)
-      // navigation handled by useEffect once player state updates
     } catch (err) {
       setError('Something went wrong. Try again.')
       console.error(err)
@@ -51,15 +62,28 @@ export default function Registration() {
       .from('players')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(30)
+      .limit(50)
     setExistingPlayers(data ?? [])
     setShowRejoin(true)
+    setSelectedPlayer(null)
+    setRejoinPassword('')
+    setPasswordError('')
     setLoading(false)
   }
 
-  function pickExistingPlayer(p) {
-    skipOnboardingRef.current = true  // rejoin always skips onboarding
-    login(p)
+  async function handleRejoinPassword(e) {
+    e.preventDefault()
+    if (!selectedPlayer || !rejoinPassword) return
+    setLoading(true)
+    const hash = await sha256(rejoinPassword)
+    if (!selectedPlayer.password_hash || hash === selectedPlayer.password_hash) {
+      skipOnboardingRef.current = true
+      login(selectedPlayer)
+    } else {
+      setPasswordError('Wrong password. Try again.')
+      setRejoinPassword('')
+    }
+    setLoading(false)
   }
 
   return (
@@ -86,41 +110,83 @@ export default function Registration() {
         </p>
 
         {!showRejoin ? (
+          /* ── New registration ── */
           <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <input
               className="input-field"
-              placeholder="Enter your explorer name..."
+              placeholder="Your explorer name..."
               value={name}
               onChange={e => setName(e.target.value)}
               maxLength={40}
               autoFocus
             />
+            <input
+              className="input-field"
+              type="password"
+              placeholder="Choose a password..."
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              maxLength={40}
+            />
             {error && <p className="text-error" style={{ fontSize: '0.875rem' }}>{error}</p>}
-            <button type="submit" className="btn-primary" disabled={loading || !name.trim()}>
+            <button type="submit" className="btn-primary" disabled={loading || !name.trim() || !password}>
               {loading ? 'Entering the jungle...' : 'Enter the Jungle'}
             </button>
             <button type="button" className="btn-ghost" onClick={handleRejoin} disabled={loading}>
               I already registered →
             </button>
           </form>
-        ) : (
+        ) : !selectedPlayer ? (
+          /* ── Pick name from list ── */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
-              Pick your name (honor system!):
+            <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              Select your name:
             </p>
-            {existingPlayers.map(p => (
-              <button
-                key={p.id}
-                className="btn-secondary"
-                onClick={() => pickExistingPlayer(p)}
-                style={{ textAlign: 'left' }}
-              >
-                {p.name}
-                {p.completed_at && ' ✓'}
-              </button>
-            ))}
+            <div style={{ maxHeight: 260, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {existingPlayers.map(p => (
+                <button
+                  key={p.id}
+                  className="btn-secondary"
+                  onClick={() => { setSelectedPlayer(p); setRejoinPassword(''); setPasswordError('') }}
+                  style={{ textAlign: 'left' }}
+                >
+                  {p.name}{p.completed_at && ' ✓'}
+                </button>
+              ))}
+            </div>
             <button className="btn-ghost" onClick={() => setShowRejoin(false)}>← Back</button>
           </div>
+        ) : (
+          /* ── Password verify ── */
+          <form onSubmit={handleRejoinPassword} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.6rem 0.75rem',
+              background: 'var(--green-light)',
+              borderRadius: 8,
+              fontSize: '0.875rem',
+              color: 'var(--green-glow)',
+              fontWeight: 'bold',
+            }}>
+              👤 {selectedPlayer.name}
+            </div>
+            <input
+              className="input-field"
+              type="password"
+              placeholder="Enter your password..."
+              value={rejoinPassword}
+              onChange={e => setRejoinPassword(e.target.value)}
+              maxLength={40}
+              autoFocus
+            />
+            {passwordError && <p className="text-error" style={{ fontSize: '0.875rem' }}>{passwordError}</p>}
+            <button type="submit" className="btn-primary" disabled={loading || !rejoinPassword}>
+              {loading ? 'Checking...' : 'Continue →'}
+            </button>
+            <button type="button" className="btn-ghost" onClick={() => setSelectedPlayer(null)}>
+              ← Pick a different name
+            </button>
+          </form>
         )}
       </div>
 

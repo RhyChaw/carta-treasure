@@ -37,7 +37,7 @@ export default function Onboarding() {
             key="video"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0 } }}
             transition={{ duration: 0.4 }}
             style={{
               position: 'fixed', inset: 0,
@@ -55,7 +55,12 @@ export default function Onboarding() {
               playsInline
               muted
               onEnded={() => setPhase('mascot')}
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              style={{
+                width: '167%',
+                height: '100%',
+                marginLeft: '-33.5%',
+                objectFit: 'cover',
+              }}
             />
             <button
               onClick={() => setPhase('mascot')}
