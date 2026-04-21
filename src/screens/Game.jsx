@@ -67,7 +67,7 @@ export default function Game() {
         }).eq('id', player.id)
         const completedAt = new Date().toISOString()
         completeGame(completedAt, isFirst)
-        navigate('/victory')
+        navigate('/victory', { state: { fresh: true, isFirst } })
         return
       }
 

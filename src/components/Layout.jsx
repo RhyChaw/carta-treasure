@@ -1,13 +1,73 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, Heart } from 'lucide-react'
+import { motion, AnimatePresence } from 'motion/react'
+import { supabase } from '../lib/supabase'
+import { usePlayer } from '../lib/playerContext'
 import Sidebar from './Sidebar'
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { player } = usePlayer()
+  const [winnerToast, setWinnerToast] = useState(null)
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('winner-broadcast')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'players' },
+        (payload) => {
+          const wasFirst = !payload.old?.is_first_place
+          const isNowFirst = payload.new?.is_first_place === true
+          if (wasFirst && isNowFirst && payload.new.id !== player?.id) {
+            setWinnerToast(payload.new.name)
+            setTimeout(() => setWinnerToast(null), 6000)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [player?.id])
 
   return (
     <>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Winner broadcast toast */}
+      <AnimatePresence>
+        {winnerToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -24, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -24, scale: 0.95 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            style={{
+              position: 'fixed',
+              top: '1rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'var(--gold)',
+              color: '#0A2A1B',
+              padding: '0.75rem 1.25rem',
+              borderRadius: 10,
+              fontSize: '0.875rem',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              maxWidth: 340,
+              width: 'calc(100% - 2.5rem)',
+              zIndex: 150,
+              boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+              lineHeight: 1.5,
+            }}
+          >
+            We have our first Jungle Champion!<br />
+            <span style={{ fontWeight: 'normal', fontSize: '0.8rem' }}>
+              {winnerToast} has conquered the hunt!
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
         <header style={{
