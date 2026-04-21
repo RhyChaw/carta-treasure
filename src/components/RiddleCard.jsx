@@ -49,6 +49,15 @@ export default function RiddleCard({ checkpoint, onScan }) {
         </button>
       </div>
 
+      {checkpoint.challengeUrl && (
+        <a
+          href={checkpoint.challengeUrl}
+          style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', display: 'block' }}
+        >
+          🔗 debug: open challenge directly
+        </a>
+      )}
+
       {showHint && (
         <motion.p
           initial={{ opacity: 0, height: 0 }}
