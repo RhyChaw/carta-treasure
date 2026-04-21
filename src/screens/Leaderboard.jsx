@@ -38,7 +38,7 @@ export default function Leaderboard() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <button className="btn-ghost" onClick={() => navigate(-1)}>← Back</button>
         <h1 style={{ fontSize: '1.1rem' }}>Jungle Leaderboard</h1>
-        <img src="/assets/host.png" alt="" style={{ width: 28, marginLeft: 'auto' }} />
+        <img src="/assets/host_front.png" alt="" style={{ width: 28, marginLeft: 'auto' }} />
       </div>
 
       {loading ? (

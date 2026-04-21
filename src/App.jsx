@@ -8,6 +8,8 @@ import Leaderboard from './screens/Leaderboard'
 import CheckpointsList from './screens/CheckpointsList'
 import MapScreen from './screens/MapScreen'
 import LuckyDraw from './screens/LuckyDraw'
+import Onboarding from './screens/Onboarding'
+import Rules from './screens/Rules'
 import RequirePlayer from './components/RequirePlayer'
 import Layout from './components/Layout'
 
@@ -31,6 +33,8 @@ export default function App() {
       <Route path="/checkpoints" element={<AuthScreen><CheckpointsList /></AuthScreen>} />
       <Route path="/map"         element={<AuthScreen><MapScreen /></AuthScreen>} />
       <Route path="/lucky-draw"  element={<Layout><LuckyDraw /></Layout>} />
+      <Route path="/onboarding"  element={<RequirePlayer><Onboarding /></RequirePlayer>} />
+      <Route path="/rules"       element={<Layout><Rules /></Layout>} />
       <Route path="*"            element={<Navigate to="/" />} />
     </Routes>
   )

@@ -48,7 +48,7 @@ export default function Layout({ children }) {
             Office Jungle
           </p>
 
-          <img src="/assets/host.png" alt="Fairy" style={{ width: 32 }} />
+          <img src="/assets/host_front.png" alt="Fairy" style={{ width: 32 }} />
         </header>
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

@@ -28,7 +28,7 @@ export default function Victory() {
         animate={{ y: [0, -12, 0], rotate: [0, -5, 5, 0] }}
         transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
       >
-        <img src="/assets/host.png" alt="Fairy" style={{ width: 150 }} />
+        <img src="/assets/host_front.png" alt="Fairy" style={{ width: 150 }} />
       </motion.div>
 
       <motion.div

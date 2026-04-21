@@ -17,7 +17,7 @@ export default function Home() {
     <div className="screen" style={{ gap: '1.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <motion.img
-          src="/assets/host.png"
+          src="/assets/host_front.png"
           alt="Fairy"
           style={{ width: 64 }}
           animate={{ y: [0, -6, 0] }}

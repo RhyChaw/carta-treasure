@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
@@ -12,9 +12,15 @@ export default function Registration() {
   const [error, setError] = useState('')
   const [showRejoin, setShowRejoin] = useState(false)
   const [existingPlayers, setExistingPlayers] = useState([])
+  const skipOnboardingRef = useRef(false)
 
   useEffect(() => {
-    if (player) navigate('/home')
+    if (!player) return
+    if (skipOnboardingRef.current || localStorage.getItem('jungle_onboarded')) {
+      navigate('/home')
+    } else {
+      navigate('/onboarding')
+    }
   }, [player, navigate])
 
   async function handleRegister(e) {
@@ -30,7 +36,7 @@ export default function Registration() {
         .single()
       if (dbError) throw dbError
       login(data)
-      navigate('/home')
+      // navigation handled by useEffect once player state updates
     } catch (err) {
       setError('Something went wrong. Try again.')
       console.error(err)
@@ -52,14 +58,14 @@ export default function Registration() {
   }
 
   function pickExistingPlayer(p) {
+    skipOnboardingRef.current = true  // rejoin always skips onboarding
     login(p)
-    navigate('/home')
   }
 
   return (
     <div className="screen-center" style={{ gap: '1.5rem' }}>
       <motion.img
-        src="/assets/host.png"
+        src="/assets/host_front.png"
         alt="Fairy"
         style={{ width: 160, imageRendering: 'pixelated' }}
         animate={{ y: [0, -10, 0] }}

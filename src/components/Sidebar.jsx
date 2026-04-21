@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { label: 'Map',           path: '/map',         icon: '🗺️' },
   { label: 'Leaderboard',   path: '/leaderboard', icon: '🏆' },
   { label: 'Lucky Draw',    path: '/lucky-draw',  icon: '🎲' },
+  { label: 'Rules',         path: '/rules',       icon: '📜' },
 ]
 
 export default function Sidebar({ open, onClose }) {
@@ -59,7 +60,7 @@ export default function Sidebar({ open, onClose }) {
               borderBottom: '1px solid rgba(255,255,255,0.1)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <img src="/assets/host.png" alt="Fairy" style={{ width: 36 }} />
+                <img src="/assets/host_front.png" alt="Fairy" style={{ width: 36 }} />
                 <div>
                   <p style={{ color: '#e8f5e2', fontWeight: 'bold', fontSize: '0.9rem' }}>
                     Office Jungle
