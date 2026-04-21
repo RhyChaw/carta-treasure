@@ -56,12 +56,12 @@
     async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
     async function check(){
       const inp=document.getElementById('answer-input')
-      const val=inp.value.trim()
+      const val=inp.value.trim().replace(/[.,!?;:]+$/,'')
       if(!val)return
       if(await sha256(val)===H){
         document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The jungle spirits approve your answer!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
       }else{
-        tries.unshift(val);inp.value='';inp.focus()
+        tries.unshift(inp.value.trim());inp.value='';inp.focus()
         document.getElementById('error-msg').textContent="That's not the winner... check the final bracket result."
         document.getElementById('tries-header').style.display='block'
         document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
