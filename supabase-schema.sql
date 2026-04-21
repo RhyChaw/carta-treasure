@@ -9,6 +9,7 @@
 CREATE TABLE players (
   id             UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
   name           TEXT        NOT NULL CHECK (char_length(trim(name)) BETWEEN 1 AND 40),
+  password_hash  TEXT,
   created_at     TIMESTAMPTZ DEFAULT now() NOT NULL,
   start_time     TIMESTAMPTZ DEFAULT now() NOT NULL,
   completed_at   TIMESTAMPTZ,
@@ -16,6 +17,9 @@ CREATE TABLE players (
   current_step   SMALLINT    NOT NULL DEFAULT 0
                              CHECK (current_step BETWEEN 0 AND 10)
 );
+
+-- If the table already exists, run this instead:
+-- ALTER TABLE players ADD COLUMN IF NOT EXISTS password_hash TEXT;
 
 -- ----------------------------------------------------------------
 -- PROGRESS (immutable audit trail — no updates/deletes)
@@ -160,3 +164,30 @@ CREATE POLICY "progress: insert own"
   WITH CHECK (player_id = get_player_id_from_header());
 
 -- No UPDATE or DELETE policy → progress rows are immutable.
+
+-- ================================================================
+-- ADMIN
+-- ================================================================
+
+-- ----------------------------------------------------------------
+-- admin_clear_all_players()
+-- Deletes all progress and player rows. Bypasses RLS via
+-- SECURITY DEFINER (runs as the function owner, not anon).
+-- PIN check is enforced client-side before calling this.
+-- ----------------------------------------------------------------
+CREATE OR REPLACE FUNCTION admin_clear_all_players()
+RETURNS INTEGER
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  DELETE FROM public.progress;
+  DELETE FROM public.players;
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION admin_clear_all_players() TO anon;

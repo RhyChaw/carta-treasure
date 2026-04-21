@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Check, User } from 'lucide-react'
+import { Check, User, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 
@@ -25,6 +25,11 @@ export default function Registration() {
   const [selectedPlayer, setSelectedPlayer]   = useState(null)
   const [rejoinPassword, setRejoinPassword]   = useState('')
   const [passwordError, setPasswordError]     = useState('')
+
+  const [showAdmin, setShowAdmin]   = useState(false)
+  const [adminPin, setAdminPin]     = useState('')
+  const [adminError, setAdminError] = useState('')
+  const [adminDone, setAdminDone]   = useState(false)
 
   useEffect(() => {
     if (!player) return
@@ -50,7 +55,7 @@ export default function Registration() {
       if (dbError) throw dbError
       login(data)
     } catch (err) {
-      setError('Something went wrong. Try again.')
+      setError(err?.message ?? 'Something went wrong. Try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -85,6 +90,25 @@ export default function Registration() {
       setRejoinPassword('')
     }
     setLoading(false)
+  }
+
+  async function handleAdminClear(e) {
+    e.preventDefault()
+    if (adminPin !== import.meta.env.VITE_LUCKY_DRAW_PIN) {
+      setAdminError('Wrong PIN.')
+      setAdminPin('')
+      return
+    }
+    setLoading(true)
+    setAdminError('')
+    const { error: rpcErr } = await supabase.rpc('admin_clear_all_players')
+    setLoading(false)
+    if (rpcErr) {
+      setAdminError(rpcErr.message)
+    } else {
+      setAdminDone(true)
+      setAdminPin('')
+    }
   }
 
   return (
@@ -194,6 +218,47 @@ export default function Registration() {
       <button className="btn-ghost" onClick={() => navigate('/leaderboard')}>
         View Leaderboard
       </button>
+
+      {/* Admin section */}
+      {!showAdmin ? (
+        <button
+          onClick={() => setShowAdmin(true)}
+          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.5, letterSpacing: '0.04em' }}
+        >
+          admin
+        </button>
+      ) : (
+        <div className="card fade-in" style={{ width: '100%', maxWidth: 360, borderColor: 'var(--error)' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--error)', fontWeight: 'bold' }}>
+            Delete All Participants
+          </p>
+          {adminDone ? (
+            <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>All participants deleted.</p>
+          ) : (
+            <form onSubmit={handleAdminClear} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <input
+                className="input-field"
+                type="password"
+                placeholder="Admin PIN..."
+                value={adminPin}
+                onChange={e => { setAdminPin(e.target.value); setAdminError('') }}
+                autoComplete="off"
+              />
+              {adminError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{adminError}</p>}
+              <button
+                type="submit"
+                disabled={loading || !adminPin}
+                style={{ background: 'var(--error)', color: '#fff', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              >
+                <Trash2 size={14} strokeWidth={2} /> {loading ? 'Deleting...' : 'Delete Everyone'}
+              </button>
+            </form>
+          )}
+          <button className="btn-ghost" onClick={() => { setShowAdmin(false); setAdminPin(''); setAdminError(''); setAdminDone(false) }} style={{ fontSize: '0.8rem' }}>
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   )
 }

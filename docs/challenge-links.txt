@@ -1,0 +1,34 @@
+OFFICE JUNGLE HUNT — CHALLENGE QR CODE LINKS
+=============================================
+Make a QR code pointing to each URL below and
+place it at the corresponding room.
+
+Checkpoint 1 — CLOVER
+https://treasure-hunt-carta.netlify.app/challenges/clover.html
+
+Checkpoint 2 — ASH
+https://treasure-hunt-carta.netlify.app/challenges/ash.html
+
+Checkpoint 3 — MAPLE
+https://treasure-hunt-carta.netlify.app/challenges/maple.html
+
+Checkpoint 4 — ORCHID
+https://treasure-hunt-carta.netlify.app/challenges/orchid.html
+
+Checkpoint 5 — HICKORY
+https://treasure-hunt-carta.netlify.app/challenges/hickory.html
+
+Checkpoint 6 — GLASGOW
+https://treasure-hunt-carta.netlify.app/challenges/glasgow.html
+
+Checkpoint 7 — IRIS
+https://treasure-hunt-carta.netlify.app/challenges/iris.html
+
+Checkpoint 8 — VIOLET
+https://treasure-hunt-carta.netlify.app/challenges/violet.html
+
+Checkpoint 9 — CHERRY
+https://treasure-hunt-carta.netlify.app/challenges/cherry.html
+
+Checkpoint 10 — LIBRARY
+https://treasure-hunt-carta.netlify.app/challenges/library.html

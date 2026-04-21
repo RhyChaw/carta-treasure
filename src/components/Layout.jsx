@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, Heart } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function Layout({ children }) {
@@ -55,6 +55,21 @@ export default function Layout({ children }) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {children}
         </div>
+
+        <footer style={{
+          padding: '0.6rem 1.25rem',
+          textAlign: 'center',
+          fontSize: '0.7rem',
+          color: 'var(--text-muted)',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.3rem',
+          flexShrink: 0,
+        }}>
+          Made by Rhythm <Heart size={11} strokeWidth={2} fill="var(--error)" color="var(--error)" />
+        </footer>
       </div>
     </>
   )

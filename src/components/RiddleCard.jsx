@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
-import { Link, Lightbulb } from 'lucide-react'
+import { Lightbulb } from 'lucide-react'
 
 export default function RiddleCard({ checkpoint, onScan }) {
   const [showHint, setShowHint] = useState(false)
@@ -49,15 +49,6 @@ export default function RiddleCard({ checkpoint, onScan }) {
           Scan QR Code
         </button>
       </div>
-
-      {checkpoint.challengeUrl && (
-        <a
-          href={checkpoint.challengeUrl}
-          style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
-        >
-          <Link size={11} strokeWidth={2} /> debug: open challenge directly
-        </a>
-      )}
 
       {showHint && (
         <motion.p
