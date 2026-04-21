@@ -34,7 +34,7 @@ export const CHECKPOINTS = [
   {
     index: 4,
     roomId: 'HICKORY',
-    passphrase: 'PLACEHOLDER_HICKORY',
+    passphrase: 'TONY',
     riddle: "Tough as old bark and smoky in legend, this tree's wood has fueled a thousand jungle campfires. Seek the southern sibling of Cherry and Ash on the jungle's eastern ridge.",
     hint: "Three large rooms on the east side. You want the southernmost one.",
     challengeUrl: '/challenges/hickory.html',

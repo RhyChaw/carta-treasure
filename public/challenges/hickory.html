@@ -21,6 +21,7 @@
     .success{color:var(--green);font-weight:bold}
     .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
     .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
+    .vision-img{width:100%;border-radius:8px;border:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -30,23 +31,28 @@
       <h1>Checkpoint 5 — Research Quest</h1>
       <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a0000;color:#ef4444;border:1px solid #ef444466">HARD</span>
     </div>
-    <p class="muted">"The fairy found a torn page from an ancient text..."</p>
+    <p class="muted">"The fairy gazes out the jungle window and sees a great wall of sigils. She whispers..."</p>
   </div>
   <div class="card">
-    <h2>The Ancient Text</h2>
-    <p>📜 <em style="color:var(--gold)">[ORGANIZER: Fill in the book title. Example: "The author who wrote <strong>The Alchemist</strong> was born in a city. That city's name is your passphrase."]</em></p>
-    <p class="muted">Search the web to find the answer.</p>
+    <h2>The Wall of Names</h2>
+    <p>Search for our jungle home on <strong style="color:var(--gold)">Google Maps</strong>. Look upon the wall of names on the great stone building.</p>
+    <p>The sigil in the <strong style="color:var(--gold)">top-left corner</strong> — that is your first clue.</p>
+    <p>Find who <strong style="color:var(--gold)">FOUNDED</strong> that guild. Three names you'll discover. Only one begins with the letter <strong style="color:var(--gold)">T</strong>.</p>
+    <p>That founder's first name is your passphrase.</p>
+    <p class="muted" style="margin-top:.25rem">💡 The fairy captured this vision in case the enchanted map shifts:</p>
+    <!-- ORGANIZER: replace challenge5.png with your Google Maps building screenshot -->
+    <img class="vision-img" src="/assets/challenge5.png" alt="Building wall of names" />
   </div>
   <div class="card" id="answer-card">
-    <p class="muted">Got it? Enter your answer:</p>
-    <input id="answer-input" placeholder="City name..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <p class="muted">Got it? Enter the founder's first name:</p>
+    <input id="answer-input" placeholder="First name..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
     <button onclick="check()">Submit →</button>
     <p id="error-msg" class="error"></p>
     <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
     <div id="tries-list"></div>
   </div>
   <script>
-    const H='0361dca13c44fbd86a10d3f0fd33c718841e83671ddb1e65b122b96bbcd3b57c'
+    const H='39be3c726a915424c776d16c53bbbe374900551a06ce4c2be8aecd669270222d'
     const tries=[]
     async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
     async function check(){
