@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { Crown, Leaf, Trophy, Clover } from 'lucide-react'
 import { usePlayer } from '../lib/playerContext'
 
 export default function Victory() {
@@ -35,9 +36,11 @@ export default function Victory() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-        style={{ fontSize: '3rem' }}
+        style={{ color: isFirst ? 'var(--gold)' : 'var(--green-glow)' }}
       >
-        {isFirst ? '👑' : '🌿'}
+        {isFirst
+          ? <Crown size={52} strokeWidth={1.5} />
+          : <Leaf size={52} strokeWidth={1.5} />}
       </motion.div>
 
       <div>
@@ -52,7 +55,9 @@ export default function Victory() {
       <div className="card" style={{ width: '100%', maxWidth: 360, textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {isFirst ? (
           <>
-            <p style={{ color: 'var(--gold)', fontWeight: 'bold' }}>🏆 FIRST PLACE — Special Prize Winner!</p>
+            <p style={{ color: 'var(--gold)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Trophy size={15} strokeWidth={2} /> FIRST PLACE — Special Prize Winner!
+            </p>
             <p style={{ fontSize: '0.875rem', fontStyle: 'italic', color: 'var(--text-muted)' }}>
               "You've claimed the magical orb, brave explorer! Head to the organizer to claim your special prize. You are excluded from the lucky draw."
               <br />— Fairy
@@ -60,7 +65,9 @@ export default function Victory() {
           </>
         ) : (
           <>
-            <p style={{ color: 'var(--green-glow)', fontWeight: 'bold' }}>🍀 Lucky Draw Entry Confirmed!</p>
+            <p style={{ color: 'var(--green-glow)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Leaf size={15} strokeWidth={2} /> Lucky Draw Entry Confirmed!
+            </p>
             <p style={{ fontSize: '0.875rem', fontStyle: 'italic', color: 'var(--text-muted)' }}>
               "The jungle bows to you, explorer. You've earned your place in the lucky draw. Stay close — fortune may still smile upon you!"
               <br />— Fairy

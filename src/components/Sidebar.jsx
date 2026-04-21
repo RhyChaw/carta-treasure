@@ -1,15 +1,16 @@
 import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Home, MapPin, ClipboardList, Map, Trophy, Dices, ScrollText, LogOut } from 'lucide-react'
 import { usePlayer } from '../lib/playerContext'
 
 const NAV_ITEMS = [
-  { label: 'Home',          path: '/home',        icon: '🏠' },
-  { label: 'Current Quest', path: '/game',        icon: '📍' },
-  { label: 'Checkpoints',   path: '/checkpoints', icon: '📋' },
-  { label: 'Map',           path: '/map',         icon: '🗺️' },
-  { label: 'Leaderboard',   path: '/leaderboard', icon: '🏆' },
-  { label: 'Lucky Draw',    path: '/lucky-draw',  icon: '🎲' },
-  { label: 'Rules',         path: '/rules',       icon: '📜' },
+  { label: 'Home',          path: '/home',        Icon: Home },
+  { label: 'Current Quest', path: '/game',        Icon: MapPin },
+  { label: 'Checkpoints',   path: '/checkpoints', Icon: ClipboardList },
+  { label: 'Map',           path: '/map',         Icon: Map },
+  { label: 'Leaderboard',   path: '/leaderboard', Icon: Trophy },
+  { label: 'Lucky Draw',    path: '/lucky-draw',  Icon: Dices },
+  { label: 'Rules',         path: '/rules',       Icon: ScrollText },
 ]
 
 export default function Sidebar({ open, onClose }) {
@@ -96,7 +97,7 @@ export default function Sidebar({ open, onClose }) {
                       textAlign: 'left',
                     }}
                   >
-                    <span style={{ fontSize: '1.1rem', minWidth: 22 }}>{item.icon}</span>
+                    <item.Icon size={17} strokeWidth={1.75} style={{ flexShrink: 0 }} />
                     {item.label}
                   </button>
                 )
@@ -108,6 +109,9 @@ export default function Sidebar({ open, onClose }) {
                 <button
                   onClick={() => { logout(); navigate('/'); onClose() }}
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
                     color: 'rgba(255,255,255,0.45)',
                     fontSize: '0.8rem',
                     textTransform: 'uppercase',
@@ -118,7 +122,8 @@ export default function Sidebar({ open, onClose }) {
                     padding: '0.5rem 0',
                   }}
                 >
-                  ⤶ Exit Hunt
+                  <LogOut size={14} strokeWidth={1.75} />
+                  Exit Hunt
                 </button>
               </div>
             )}

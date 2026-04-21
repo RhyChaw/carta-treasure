@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { Medal, Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { CHECKPOINTS } from '../lib/checkpoints'
 
 const RANK_COLORS = ['#FBBF24', '#9ca3af', '#d97706']
-const RANK_LABELS = ['🥇', '🥈', '🥉']
 
 function formatDuration(createdAt, completedAt) {
   if (!completedAt) return null
@@ -83,7 +83,9 @@ export default function Leaderboard() {
                     textAlign: 'center',
                     fontWeight: 'bold',
                   }}>
-                    {i < 3 ? RANK_LABELS[i] : `#${i + 1}`}
+                    {i < 3
+                    ? <Medal size={18} strokeWidth={1.75} color={RANK_COLORS[i]} fill={RANK_COLORS[i] + '33'} />
+                    : `#${i + 1}`}
                   </span>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
@@ -103,7 +105,9 @@ export default function Leaderboard() {
                     fontWeight: 'bold',
                     color: isFinished ? 'var(--green-glow)' : 'var(--text-muted)',
                   }}>
-                    {isFinished ? '✓ Done' : `${row.current_step}/${CHECKPOINTS.length}`}
+                    {isFinished
+                      ? <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Check size={12} strokeWidth={2.5} />Done</span>
+                      : `${row.current_step}/${CHECKPOINTS.length}`}
                   </span>
                 </motion.div>
               )

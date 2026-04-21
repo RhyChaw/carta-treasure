@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
+import { Leaf } from 'lucide-react'
 import { RulesList } from './Rules'
 
 export default function Onboarding() {
@@ -144,7 +145,7 @@ export default function Onboarding() {
                   }} />
 
                   <p style={{ color: 'var(--text)', lineHeight: 1.65, fontSize: '0.95rem', marginBottom: '0.65rem' }}>
-                    Hey there, explorer! 🌿 I'm{' '}
+                    Hey there, explorer! <Leaf size={13} strokeWidth={2} color="var(--green-glow)" style={{ verticalAlign: 'middle' }} /> I'm{' '}
                     <strong style={{ color: 'var(--green-glow)' }}>Fairy</strong>, your guide
                     through the <em>Office Jungle</em>.
                   </p>
@@ -193,7 +194,7 @@ export default function Onboarding() {
               onClick={handleComplete}
               style={{ marginTop: '0.25rem' }}
             >
-              Start the Hunt! 🌿
+              Start the Hunt! <Leaf size={14} strokeWidth={2} style={{ marginLeft: 4 }} />
             </button>
           </motion.div>
         )}

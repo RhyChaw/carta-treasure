@@ -1,10 +1,23 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
+import { Check, Lock, Star, Flame } from 'lucide-react'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS } from '../lib/checkpoints'
 
-const DIFFICULTY = ['⭐','⭐⭐','⭐⭐⭐','⭐','⭐⭐','⭐⭐⭐','⭐','⭐⭐','⭐⭐⭐','🔥']
+const DIFFICULTY_LEVELS = [1, 2, 3, 1, 2, 1, 1, 2, 3, null] // null = flame
+
+function DifficultyIndicator({ index }) {
+  const level = DIFFICULTY_LEVELS[index]
+  if (level === null) return <Flame size={12} color="var(--error)" strokeWidth={2} />
+  return (
+    <span style={{ display: 'flex', gap: 1 }}>
+      {Array.from({ length: level }).map((_, i) => (
+        <Star key={i} size={10} fill="var(--gold)" color="var(--gold)" strokeWidth={0} />
+      ))}
+    </span>
+  )
+}
 
 function CheckpointRow({ checkpoint, state, onTap, expanded }) {
   const isDone    = state === 'done'
@@ -49,7 +62,7 @@ function CheckpointRow({ checkpoint, state, onTap, expanded }) {
           animation: isCurrent ? 'pulse-glow 2s ease-in-out infinite' : 'none',
           flexShrink: 0,
         }}>
-          {isDone ? '✓' : checkpoint.index + 1}
+          {isDone ? <Check size={13} strokeWidth={2.5} /> : checkpoint.index + 1}
         </span>
 
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -61,13 +74,8 @@ function CheckpointRow({ checkpoint, state, onTap, expanded }) {
           </p>
         </div>
 
-        {!isLocked && (
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>
-            {DIFFICULTY[checkpoint.index]}
-          </span>
-        )}
-
-        {isLocked && <span style={{ fontSize: '1rem', color: 'var(--text-muted)', flexShrink: 0 }}>🔒</span>}
+        {!isLocked && <DifficultyIndicator index={checkpoint.index} />}
+        {isLocked && <Lock size={15} color="var(--text-muted)" strokeWidth={1.75} />}
       </motion.button>
 
       <AnimatePresence>
@@ -88,6 +96,9 @@ function CheckpointRow({ checkpoint, state, onTap, expanded }) {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
                 background: 'var(--green-glow)',
                 color: '#fff',
                 fontSize: '0.7rem',
@@ -97,7 +108,7 @@ function CheckpointRow({ checkpoint, state, onTap, expanded }) {
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}>
-                Completed ✓
+                <Check size={11} strokeWidth={2.5} /> Completed
               </span>
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text)', lineHeight: 1.6 }}>

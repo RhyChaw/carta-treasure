@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function Layout({ children }) {
@@ -35,7 +36,7 @@ export default function Layout({ children }) {
             }}
             aria-label="Open menu"
           >
-            ☰
+            <Menu size={20} strokeWidth={1.75} />
           </button>
 
           <p style={{

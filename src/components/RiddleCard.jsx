@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
+import { Link, Lightbulb } from 'lucide-react'
 
 export default function RiddleCard({ checkpoint, onScan }) {
   const [showHint, setShowHint] = useState(false)
@@ -52,9 +53,9 @@ export default function RiddleCard({ checkpoint, onScan }) {
       {checkpoint.challengeUrl && (
         <a
           href={checkpoint.challengeUrl}
-          style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', display: 'block' }}
+          style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
         >
-          🔗 debug: open challenge directly
+          <Link size={11} strokeWidth={2} /> debug: open challenge directly
         </a>
       )}
 
@@ -62,9 +63,9 @@ export default function RiddleCard({ checkpoint, onScan }) {
         <motion.p
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          style={{ marginTop: '0.75rem', color: 'var(--gold)', fontSize: '0.875rem', fontStyle: 'italic' }}
+          style={{ marginTop: '0.75rem', color: 'var(--gold)', fontSize: '0.875rem', fontStyle: 'italic', display: 'flex', alignItems: 'flex-start', gap: '0.4rem' }}
         >
-          💡 {checkpoint.hint}
+          <Lightbulb size={14} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />{checkpoint.hint}
         </motion.p>
       )}
     </motion.div>

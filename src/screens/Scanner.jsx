@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 import { parseQrCode } from '../lib/checkpoints'
 
 export default function Scanner() {
@@ -105,7 +106,7 @@ export default function Scanner() {
           cursor: 'pointer',
         }}
       >
-        ✕
+        <X size={18} strokeWidth={2} />
       </button>
 
       <p style={{

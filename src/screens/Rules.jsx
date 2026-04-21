@@ -1,38 +1,39 @@
 import { motion } from 'motion/react'
+import { MapPin, Search, Puzzle, KeyRound, Hash, Trophy, Dices } from 'lucide-react'
 
 const RULES = [
   {
-    icon: '📍',
+    Icon: MapPin,
     title: 'Follow the riddle',
     body: 'Each checkpoint gives you a clue. Read it carefully to figure out which room to head to.',
   },
   {
-    icon: '🔍',
+    Icon: Search,
     title: 'Scan or type the room code',
     body: 'At each room, find the QR code and scan it — or type the room code manually to unlock the challenge.',
   },
   {
-    icon: '🧩',
+    Icon: Puzzle,
     title: 'Solve the challenge',
     body: 'Every checkpoint has a mini-puzzle. Crack it to reveal the secret passphrase.',
   },
   {
-    icon: '⌨️',
+    Icon: KeyRound,
     title: 'Enter the passphrase',
     body: 'Type the passphrase in the app to complete the checkpoint and unlock your next riddle.',
   },
   {
-    icon: '🔟',
+    Icon: Hash,
     title: '10 checkpoints total',
     body: 'There are 10 checkpoints hidden across the office. Complete all of them to finish the hunt.',
   },
   {
-    icon: '🏆',
+    Icon: Trophy,
     title: 'First to finish wins',
     body: 'The first explorer to complete all 10 checkpoints wins the hunt.',
   },
   {
-    icon: '🎲',
+    Icon: Dices,
     title: 'Lucky Draw for everyone else',
     body: "Didn't finish first? No worries — every finisher enters the Lucky Draw for extra prizes.",
   },
@@ -50,7 +51,7 @@ export function RulesList() {
           className="card"
           style={{ display: 'flex', alignItems: 'flex-start', gap: '0.875rem', padding: '0.875rem 1rem' }}
         >
-          <span style={{ fontSize: '1.25rem', flexShrink: 0, lineHeight: 1.4 }}>{rule.icon}</span>
+          <rule.Icon size={18} strokeWidth={1.75} style={{ flexShrink: 0, marginTop: 2, color: 'var(--green-glow)' }} />
           <div>
             <p style={{ fontWeight: 'bold', fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.2rem' }}>
               {rule.title}

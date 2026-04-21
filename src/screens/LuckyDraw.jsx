@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { Dices, PartyPopper, Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { pickWinners } from '../lib/luckyDraw'
 
@@ -138,7 +139,9 @@ export default function LuckyDraw() {
   return (
     <div className="screen">
       <div>
-        <h1 style={{ fontSize: '1.1rem' }}>Lucky Draw 🎲</h1>
+        <h1 style={{ fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Dices size={18} strokeWidth={1.75} color="var(--green-glow)" /> Lucky Draw
+        </h1>
         <p className="text-muted" style={{ fontSize: '0.8rem' }}>
           {loading
             ? 'Loading...'
@@ -183,7 +186,10 @@ export default function LuckyDraw() {
           onClick={handleDraw}
           disabled={drawing || drawn || eligible.length === 0}
         >
-          {drawn ? 'Draw Complete 🎉' : drawing ? 'Drawing...' : `Draw ${Math.min(DRAW_COUNT, eligible.length)} Winners`}
+          {drawn
+            ? <><PartyPopper size={15} strokeWidth={2} style={{ marginRight: 6 }} />Draw Complete</>
+            : drawing ? 'Drawing...'
+            : `Draw ${Math.min(DRAW_COUNT, eligible.length)} Winners`}
         </button>
       )}
 
@@ -211,7 +217,7 @@ export default function LuckyDraw() {
                     transition: 'all 0.3s',
                   }}
                 >
-                  {isWinner && '✓ '}{p.name}
+                  {isWinner && <Check size={11} strokeWidth={2.5} style={{ marginRight: 3 }} />}{p.name}
                 </span>
               )
             })}

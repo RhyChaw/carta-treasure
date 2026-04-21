@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint, validatePassphrase } from '../lib/checkpoints'
@@ -24,7 +25,7 @@ export default function Game() {
       sessionStorage.removeItem('jungle_scan_result')
       const current = getCheckpoint(player?.current_step)
       if (current && pending === current.roomId) {
-        showToast(`✨ You found ${pending}! Solve the challenge and enter the passphrase.`, 'success')
+        showToast(`You found ${pending}! Solve the challenge and enter the passphrase.`, 'success')
       } else {
         showToast("The spirits here don't welcome us yet... we must look elsewhere, explorer.", 'error')
       }
@@ -118,7 +119,7 @@ export default function Game() {
       {completedCheckpoints.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {completedCheckpoints.map(c => (
-            <span key={c.roomId} style={{
+            <span key={c.roomId} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem',
               background: '#0d3522',
               border: '1px solid var(--green-glow)',
               color: 'var(--green-glow)',
@@ -127,7 +128,7 @@ export default function Game() {
               fontSize: '0.75rem',
               letterSpacing: '0.04em',
             }}>
-              ✓ {c.roomId}
+              <Check size={10} strokeWidth={2.5} />{c.roomId}
             </span>
           ))}
         </div>

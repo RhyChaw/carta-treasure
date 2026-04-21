@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { Crown, Leaf, Map, Trophy, Dices } from 'lucide-react'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint } from '../lib/checkpoints'
 import ProgressBar from '../components/ProgressBar'
@@ -76,9 +77,9 @@ export default function Home() {
 
       {isComplete && (
         <div className="card" style={{ textAlign: 'center', borderLeft: '4px solid var(--gold)' }}>
-          <p style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>
-            {player.is_first_place ? '👑' : '🌿'}
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.25rem', color: player.is_first_place ? 'var(--gold)' : 'var(--green-glow)' }}>
+            {player.is_first_place ? <Crown size={28} strokeWidth={1.5} /> : <Leaf size={28} strokeWidth={1.5} />}
+          </div>
           <p style={{ fontWeight: 'bold', color: 'var(--gold)' }}>
             {player.is_first_place ? 'Jungle Champion!' : 'Hunt Complete!'}
           </p>
@@ -90,9 +91,9 @@ export default function Home() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
         {[
-          { label: 'Map',         icon: '🗺️',  path: '/map' },
-          { label: 'Leaderboard', icon: '🏆',  path: '/leaderboard' },
-          { label: 'Lucky Draw',  icon: '🎲',  path: '/lucky-draw' },
+          { label: 'Map',         Icon: Map,    path: '/map' },
+          { label: 'Leaderboard', Icon: Trophy, path: '/leaderboard' },
+          { label: 'Lucky Draw',  Icon: Dices,  path: '/lucky-draw' },
         ].map(tile => (
           <button
             key={tile.path}
@@ -108,7 +109,7 @@ export default function Home() {
               transition: 'box-shadow 0.15s',
             }}
           >
-            <span style={{ fontSize: '1.4rem' }}>{tile.icon}</span>
+            <tile.Icon size={22} strokeWidth={1.5} color="var(--green-glow)" />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {tile.label}
             </span>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { Check, User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 
@@ -150,7 +151,7 @@ export default function Registration() {
                   onClick={() => { setSelectedPlayer(p); setRejoinPassword(''); setPasswordError('') }}
                   style={{ textAlign: 'left' }}
                 >
-                  {p.name}{p.completed_at && ' ✓'}
+                  {p.name}{p.completed_at && <Check size={12} strokeWidth={2.5} style={{ marginLeft: 4 }} />}
                 </button>
               ))}
             </div>
@@ -168,7 +169,7 @@ export default function Registration() {
               color: 'var(--green-glow)',
               fontWeight: 'bold',
             }}>
-              👤 {selectedPlayer.name}
+              <User size={14} strokeWidth={2} style={{ marginRight: 4 }} /> {selectedPlayer.name}
             </div>
             <input
               className="input-field"
