@@ -26,7 +26,7 @@ export const CHECKPOINTS = [
   {
     index: 3,
     roomId: 'ORCHID',
-    passphrase: 'PLACEHOLDER_ORCHID',
+    passphrase: 'CARTA',
     riddle: "Exotic and rare, the jungle's most prized bloom grows near where the healers rest. Seek the flower closest to the place of first aid.",
     hint: "Head to the far east side, near the First Aid / Mother's Room.",
     challengeUrl: '/challenges/orchid.html',
