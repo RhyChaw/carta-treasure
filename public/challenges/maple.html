@@ -21,29 +21,37 @@
     .success{color:var(--green);font-weight:bold}
     .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
     .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
+    .bracket-link{display:block;background:#071e12;border:1px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'Courier New',monospace;font-size:.9rem;font-weight:bold;padding:.8rem 1.25rem;text-align:center;text-decoration:none;letter-spacing:.04em}
+    .bracket-link:hover{background:#0d3522}
   </style>
 </head>
 <body>
   <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
-    <h1>Checkpoint 3 — Bracket City</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+      <h1>Checkpoint 3 — Bracket City</h1>
+      <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a1f00;color:#FBBF24;border:1px solid #FBBF2466">MEDIUM</span>
+    </div>
     <p class="muted">"The jungle spirits must decide their champion. You must guide the tournament!"</p>
   </div>
   <div class="card">
     <h2>Best Office Snack Tournament</h2>
-    <p>🏆 <em style="color:var(--gold)">[ORGANIZER: Embed your Bracket City tournament link or describe the bracket challenge here. The final winner determines the passphrase.]</em></p>
-    <p class="muted">Complete the bracket. The winning item's name is your passphrase.</p>
+    <p>Play today's <strong style="color:var(--gold)">Bracket City</strong> and work your way to the final winner. The winning event is your passphrase.</p>
+    <a class="bracket-link" href="https://www.theatlantic.com/games/bracket-city/?date=2026-04-20" target="_blank" rel="noopener">
+      🏆 Open Bracket City →
+    </a>
+    <p class="muted">Complete the bracket all the way to the final. Copy the exact text of the winning event below.</p>
   </div>
   <div class="card" id="answer-card">
-    <p class="muted">Got it? Enter the winner:</p>
-    <input id="answer-input" placeholder="Your passphrase..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <p class="muted">Enter the winning event (exact text):</p>
+    <input id="answer-input" placeholder="Winning event..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
     <button onclick="check()">Submit →</button>
     <p id="error-msg" class="error"></p>
     <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
     <div id="tries-list"></div>
   </div>
   <script>
-    const H='a77dd233250dbc57e039424791c30b1fedd6c1a7a15c09f9caba6d8bbe27e4ee'
+    const H='01e0b5180a295c8840a4a2c0b5af43c2c189f96fd11c3cad2ea71aabaeb62544'
     const tries=[]
     async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
     async function check(){
@@ -54,7 +62,7 @@
         document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The jungle spirits approve your answer!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
       }else{
         tries.unshift(val);inp.value='';inp.focus()
-        document.getElementById('error-msg').textContent="That's not the winner... try again."
+        document.getElementById('error-msg').textContent="That's not the winner... check the final bracket result."
         document.getElementById('tries-header').style.display='block'
         document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
       }
