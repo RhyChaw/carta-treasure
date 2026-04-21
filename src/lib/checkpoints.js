@@ -58,7 +58,7 @@ export const CHECKPOINTS = [
   {
     index: 7,
     roomId: 'VIOLET',
-    passphrase: 'PLACEHOLDER_VIOLET_NUMBER',
+    passphrase: ['TEN', '10'],
     riddle: "Shrinking and shy, a tiny purple bloom hides in the jungle's far northeast corner, high above where explorers enter and exit.",
     hint: "Far northeast corner, near the Employee Entrance.",
     challengeUrl: '/challenges/violet.html',
@@ -86,7 +86,11 @@ export function getCheckpoint(index) {
 }
 
 export function validatePassphrase(checkpoint, input) {
-  return checkpoint.passphrase.toUpperCase() === input.trim().toUpperCase()
+  const normalized = input.trim().toUpperCase()
+  if (Array.isArray(checkpoint.passphrase)) {
+    return checkpoint.passphrase.some(p => p.toUpperCase() === normalized)
+  }
+  return checkpoint.passphrase.toUpperCase() === normalized
 }
 
 export function parseQrCode(raw) {

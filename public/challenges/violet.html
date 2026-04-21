@@ -7,60 +7,141 @@
   <style>
     :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35;--error:#ef4444}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem 3rem;gap:1.25rem}
     .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px;display:flex;flex-direction:column;gap:.75rem}
     h1{color:var(--green);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase}
-    h2{color:var(--gold);font-size:1rem}
+    h2{color:var(--gold);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.1rem}
     p{line-height:1.6;font-size:.95rem}
     .fairy{width:80px}
     .muted{color:var(--muted);font-size:.875rem;font-style:italic}
-    input{background:#071e12;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none}
-    input:focus{border-color:var(--green)}
-    button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
-    .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-weight:bold}
-    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
-    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
+    .word-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.5rem}
+    .word-input{
+      background:#071e12;
+      border:1.5px solid var(--border);
+      border-radius:8px;
+      color:var(--text);
+      font-family:'Courier New',monospace;
+      font-size:.9rem;
+      padding:.55rem .6rem;
+      text-align:center;
+      text-transform:uppercase;
+      outline:none;
+      width:100%;
+      transition:border-color .2s,background .2s,color .2s;
+    }
+    .word-input:focus{border-color:var(--gold)}
+    .word-input.correct{border-color:var(--green);background:#0d3522;color:var(--green);font-weight:bold}
+    .word-input.wrong{border-color:var(--error)}
+    .section-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.15rem}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none}
+    #progress{font-size:.8rem;color:var(--muted);text-align:right}
+    #success-card{display:none}
   </style>
 </head>
 <body>
   <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
+
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
-      <h1>Checkpoint 8 — CARTA Word Challenge</h1>
-      <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a1f00;color:#FBBF24;border:1px solid #FBBF2466">MEDIUM</span>
+      <h1>Checkpoint 8 — CARTA Words</h1>
+      <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a0000;color:#ef4444;border:1px solid #ef444466">HARD</span>
     </div>
     <p class="muted">"The fairy needs you to prove your linguistic powers, explorer!"</p>
   </div>
+
   <div class="card">
-    <h2>Letters: C, A, R, T, A</h2>
-    <p>Using ONLY the letters <strong style="color:var(--gold)">C, A, R, T, A</strong> — how many valid English words of 3+ letters can you form?</p>
-    <p class="muted">(You have two A's. CARTA counts. No proper nouns except CARTA.)</p>
-    <p class="muted">Word bank to check yourself: ARC, ART, CAR, CAT, RAT, TAR, ACT, CART, CARAT, CARTA...</p>
+    <h2>Letters: C · A · R · T · A</h2>
+    <p style="font-size:.875rem">Using <strong style="color:var(--gold)">only</strong> the letters <strong style="color:var(--gold)">C, A, R, T, A</strong> (two A's), find all valid English words of 3+ letters. No proper nouns except CARTA.</p>
+    <p class="muted" style="font-size:.8rem">Fill every box — all must turn green to pass.</p>
+    <p id="progress">0 / 10 found</p>
   </div>
-  <div class="card" id="answer-card">
-    <p class="muted">Got it? Enter the count:</p>
-    <input id="answer-input" placeholder="Enter the count as a number..." type="number" min="0" max="30" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
-    <button onclick="check()">Submit →</button>
-    <p id="error-msg" class="error"></p>
-    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
-    <div id="tries-list"></div>
+
+  <div class="card" id="puzzle-card">
+    <div>
+      <p class="section-label">3-letter words &nbsp;(7)</p>
+      <div class="word-grid" id="grid-3"></div>
+    </div>
+    <div>
+      <p class="section-label">4-letter words &nbsp;(1)</p>
+      <div class="word-grid" id="grid-4"></div>
+    </div>
+    <div>
+      <p class="section-label">5-letter words &nbsp;(2)</p>
+      <div class="word-grid" id="grid-5"></div>
+    </div>
   </div>
+
+  <div class="card" id="success-card">
+    <p style="color:var(--green);font-weight:bold;text-align:center;font-size:1rem">✓ All 10 words found! The jungle spirits are impressed!</p>
+    <a class="back-btn" href="/game?passphrase=TEN">Back to App →</a>
+  </div>
+
   <script>
-    const H='e52b43679bca16fee47d89f4fc356a4181cd39d19cec46db9a2f97e084829937'
-    const tries=[]
-    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-    async function check(){
-      const inp=document.getElementById('answer-input')
-      const val=inp.value.trim()
-      if(!val)return
-      if(await sha256(val)===H){
-        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The fairy claps! You counted right!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
-      }else{
-        tries.unshift(val);inp.value='';inp.focus()
-        document.getElementById('error-msg').textContent="Not quite the right count. Check your word list!"
-        document.getElementById('tries-header').style.display='block'
-        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+    const VALID = {
+      3: ['ARC','ART','CAR','CAT','RAT','TAR','ACT'],
+      4: ['CART','ACTA'],
+      5: ['CARAT','CARTA']
+    }
+    const ALL_VALID = [...VALID[3], ...VALID[4], ...VALID[5]]
+
+    function makeInputs(containerId, count) {
+      const container = document.getElementById(containerId)
+      for (let i = 0; i < count; i++) {
+        const inp = document.createElement('input')
+        inp.className = 'word-input'
+        inp.maxLength = 5
+        inp.autocomplete = 'off'
+        inp.spellcheck = false
+        inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase(); validate() })
+        inp.addEventListener('blur', () => validate())
+        container.appendChild(inp)
+      }
+    }
+
+    makeInputs('grid-3', 7)
+    makeInputs('grid-4', 1)
+    makeInputs('grid-5', 2)
+
+    const allInputs = Array.from(document.querySelectorAll('.word-input'))
+
+    function getUsedWords() {
+      return allInputs
+        .filter(el => el.dataset.valid === '1')
+        .map(el => el.dataset.word)
+    }
+
+    function validate() {
+      // First pass: clear state
+      allInputs.forEach(el => {
+        el.dataset.valid = '0'
+        el.dataset.word = ''
+        el.classList.remove('correct', 'wrong')
+      })
+
+      // Second pass: mark correct greedily (first come first served)
+      const used = []
+      allInputs.forEach(el => {
+        const val = el.value.trim().toUpperCase()
+        if (!val) return
+        if (ALL_VALID.includes(val) && !used.includes(val)) {
+          el.dataset.valid = '1'
+          el.dataset.word = val
+          el.classList.add('correct')
+          used.push(val)
+        } else if (val.length >= 3) {
+          el.classList.add('wrong')
+        }
+      })
+
+      const count = allInputs.filter(el => el.dataset.valid === '1').length
+      document.getElementById('progress').textContent = count + ' / 10 found'
+
+      if (count === 10) {
+        document.getElementById('success-card').style.display = 'flex'
+        document.getElementById('success-card').style.flexDirection = 'column'
+        document.getElementById('success-card').style.gap = '.75rem'
+        document.getElementById('puzzle-card').style.opacity = '.5'
+        document.getElementById('puzzle-card').style.pointerEvents = 'none'
       }
     }
   </script>

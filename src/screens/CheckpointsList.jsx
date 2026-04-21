@@ -5,7 +5,7 @@ import { Check, Lock, Star, Flame } from 'lucide-react'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS } from '../lib/checkpoints'
 
-const DIFFICULTY_LEVELS = [1, 2, 3, 1, 2, 1, 1, 2, 3, null] // null = flame
+const DIFFICULTY_LEVELS = [1, 2, 3, 1, 2, 1, 1, 3, 3, null] // null = flame
 
 function DifficultyIndicator({ index }) {
   const level = DIFFICULTY_LEVELS[index]
