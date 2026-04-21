@@ -18,11 +18,13 @@
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+    .success{color:var(--green);font-weight:bold}
+    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
   </style>
 </head>
 <body>
-  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
     <h1>Checkpoint 7 — Sequence Completion</h1>
     <p class="muted">"Complete the jungle sequence. The missing flower is your passphrase."</p>
@@ -31,16 +33,31 @@
     <h2>What Comes Next?</h2>
     <p style="font-size:1.1rem">Maple → Oak → Pine → <strong style="color:var(--gold)">?</strong> → Ash</p>
     <p class="muted">💡 Hint: Look at the office map. These rooms appear in geographic sequence.</p>
-    <input id="iris" placeholder="Room name..." autocapitalize="characters" />
-    <button onclick="checkIris()">Check Answer</button>
-    <p id="iris-result"></p>
+  </div>
+  <div class="card" id="answer-card">
+    <p class="muted">Got it? Enter the room name:</p>
+    <input id="answer-input" placeholder="Room name..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <button onclick="check()">Submit →</button>
+    <p id="error-msg" class="error"></p>
+    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
+    <div id="tries-list"></div>
   </div>
   <script>
-    function checkIris() {
-      const val = document.getElementById('iris').value.trim().toUpperCase();
-      const el = document.getElementById('iris-result');
-      if (val === 'WALNUT') { el.className='success'; el.textContent='✓ Correct! Passphrase: WALNUT'; }
-      else { el.className='error'; el.textContent="Hmm, that doesn't fit the sequence. Check the map again."; }
+    const H='b6a6a428372fa9bff5a95c1bf4c7b8bd3b07ca07b6b61f8582fa90e4b0960033'
+    const tries=[]
+    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+    async function check(){
+      const inp=document.getElementById('answer-input')
+      const val=inp.value.trim()
+      if(!val)return
+      if(await sha256(val)===H){
+        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The jungle spirits approve your answer!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
+      }else{
+        tries.unshift(val);inp.value='';inp.focus()
+        document.getElementById('error-msg').textContent="Hmm, that doesn't fit the sequence. Check the map again."
+        document.getElementById('tries-header').style.display='block'
+        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+      }
     }
   </script>
 </body>

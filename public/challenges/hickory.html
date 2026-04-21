@@ -18,11 +18,13 @@
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+    .success{color:var(--green);font-weight:bold}
+    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
   </style>
 </head>
 <body>
-  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
     <h1>Checkpoint 5 — Research Quest</h1>
     <p class="muted">"The fairy found a torn page from an ancient text..."</p>
@@ -31,17 +33,31 @@
     <h2>The Ancient Text</h2>
     <p>📜 <em style="color:var(--gold)">[ORGANIZER: Fill in the book title. Example: "The author who wrote <strong>The Alchemist</strong> was born in a city. That city's name is your passphrase."]</em></p>
     <p class="muted">Search the web to find the answer.</p>
-    <input id="hick" placeholder="City name..." autocapitalize="characters" />
-    <button onclick="checkHickory()">Check Answer</button>
-    <p id="hick-result"></p>
+  </div>
+  <div class="card" id="answer-card">
+    <p class="muted">Got it? Enter your answer:</p>
+    <input id="answer-input" placeholder="City name..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <button onclick="check()">Submit →</button>
+    <p id="error-msg" class="error"></p>
+    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
+    <div id="tries-list"></div>
   </div>
   <script>
-    const ANSWER = 'PLACEHOLDER_HICKORY';
-    function checkHickory() {
-      const val = document.getElementById('hick').value.trim().toUpperCase().replace(/\s+/g,'');
-      const el = document.getElementById('hick-result');
-      if (val === ANSWER) { el.className='success'; el.textContent='✓ The fairy is impressed! Passphrase: ' + ANSWER; }
-      else { el.className='error'; el.textContent="The jungle spirits say no... try again."; }
+    const H='0361dca13c44fbd86a10d3f0fd33c718841e83671ddb1e65b122b96bbcd3b57c'
+    const tries=[]
+    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+    async function check(){
+      const inp=document.getElementById('answer-input')
+      const val=inp.value.trim()
+      if(!val)return
+      if(await sha256(val)===H){
+        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The jungle spirits approve your answer!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
+      }else{
+        tries.unshift(val);inp.value='';inp.focus()
+        document.getElementById('error-msg').textContent="The jungle spirits say no... try again."
+        document.getElementById('tries-header').style.display='block'
+        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+      }
     }
   </script>
 </body>

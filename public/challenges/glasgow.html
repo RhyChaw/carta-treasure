@@ -18,11 +18,13 @@
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+    .success{color:var(--green);font-weight:bold}
+    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
   </style>
 </head>
 <body>
-  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
     <h1>Checkpoint 6 — Cipher Decode</h1>
     <p class="muted">"The fairy intercepted a coded message from the jungle spirits. Decode it to proceed."</p>
@@ -32,16 +34,31 @@
     <p style="font-size:1.2rem;letter-spacing:.1em;color:var(--gold)">WKHBXQJOHLVDOLYH</p>
     <p class="muted">Each letter was shifted <strong>forward by 3</strong>. Shift it back to decode.</p>
     <p class="muted">Example: D→A, E→B, F→C ...</p>
-    <input id="glas" placeholder="Decoded message (no spaces)..." autocapitalize="characters" />
-    <button onclick="checkGlasgow()">Check Answer</button>
-    <p id="glas-result"></p>
+  </div>
+  <div class="card" id="answer-card">
+    <p class="muted">Got it? Enter the decoded message (no spaces):</p>
+    <input id="answer-input" placeholder="Decoded message..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <button onclick="check()">Submit →</button>
+    <p id="error-msg" class="error"></p>
+    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
+    <div id="tries-list"></div>
   </div>
   <script>
-    function checkGlasgow() {
-      const val = document.getElementById('glas').value.trim().toUpperCase().replace(/\s+/g,'');
-      const el = document.getElementById('glas-result');
-      if (val === 'THEJUNGLEISALIVE') { el.className='success'; el.textContent='✓ The spirits speak! Passphrase: THEJUNGLEISALIVE'; }
-      else { el.className='error'; el.textContent="The cipher remains unbroken... try again."; }
+    const H='bd473fe72ec78413109f5369f67fe41affd49899a776fde950bc23168937ad4a'
+    const tries=[]
+    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase().replace(/\s+/g,'')));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+    async function check(){
+      const inp=document.getElementById('answer-input')
+      const val=inp.value.trim()
+      if(!val)return
+      if(await sha256(val)===H){
+        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ The cipher is broken! The jungle spirits speak!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase().replace(/\s+/g,''))+'">Back to App →</a>'
+      }else{
+        tries.unshift(val);inp.value='';inp.focus()
+        document.getElementById('error-msg').textContent="The cipher remains unbroken... try again."
+        document.getElementById('tries-header').style.display='block'
+        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+      }
     }
   </script>
 </body>

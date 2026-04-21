@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'motion/react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint, validatePassphrase } from '../lib/checkpoints'
@@ -10,12 +9,11 @@ import Toast from '../components/Toast'
 
 export default function Game() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { player, updateStep, completeGame } = usePlayer()
-  const [passphrase, setPassphrase] = useState('')
+  const [passphrase, setPassphrase] = useState(() => searchParams.get('passphrase') ?? '')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
-  const [scanResult, setScanResult] = useState(null)
-
   useEffect(() => {
     if (!player) navigate('/')
   }, [player, navigate])
@@ -24,24 +22,18 @@ export default function Game() {
     const pending = sessionStorage.getItem('jungle_scan_result')
     if (pending) {
       sessionStorage.removeItem('jungle_scan_result')
-      handleScanResult(pending)
+      const current = getCheckpoint(player?.current_step)
+      if (current && pending === current.roomId) {
+        showToast(`✨ You found ${pending}! Solve the challenge and enter the passphrase.`, 'success')
+      } else {
+        showToast("The spirits here don't welcome us yet... we must look elsewhere, explorer.", 'error')
+      }
     }
   }, [])
 
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type })
     setTimeout(() => setToast(t => ({ ...t, visible: false })), 3500)
-  }
-
-  function handleScanResult(scannedRoomId) {
-    const current = getCheckpoint(player.current_step)
-    if (!current) return
-    if (scannedRoomId === current.roomId) {
-      setScanResult(scannedRoomId)
-      showToast(`✨ You found ${scannedRoomId}! Now solve the challenge.`, 'success')
-    } else {
-      showToast("The spirits here don't welcome us yet... we must look elsewhere, explorer.", 'error')
-    }
   }
 
   async function handlePassphraseSubmit(e) {
@@ -80,7 +72,6 @@ export default function Game() {
 
       await supabase.from('players').update({ current_step: nextStep }).eq('id', player.id)
       updateStep(nextStep)
-      setScanResult(null)
       setPassphrase('')
       showToast("Brilliant! The path forward reveals itself!", 'success')
     } catch (err) {
@@ -101,36 +92,28 @@ export default function Game() {
 
       <ProgressBar current={player.current_step} total={CHECKPOINTS.length} />
 
-      {!scanResult ? (
-        <RiddleCard
-          checkpoint={currentCheckpoint}
-          onScan={() => navigate('/scan')}
-        />
-      ) : (
-        <motion.div className="card fade-in" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
-            "Enter the passphrase from the challenge, explorer..."
-          </p>
-          <form onSubmit={handlePassphraseSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <input
-              className="input-field"
-              placeholder="Enter passphrase..."
-              value={passphrase}
-              onChange={e => setPassphrase(e.target.value)}
-              autoFocus
-              autoCapitalize="none"
-            />
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button type="button" className="btn-secondary" onClick={() => { setScanResult(null); setPassphrase('') }}>
-                ← Back
-              </button>
-              <button type="submit" className="btn-primary" disabled={loading || !passphrase.trim()}>
-                {loading ? 'Checking...' : 'Submit'}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      )}
+      <RiddleCard
+        checkpoint={currentCheckpoint}
+        onScan={() => navigate('/scan')}
+      />
+
+      <div className="card">
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
+          "Got the answer? Enter the passphrase here, explorer..."
+        </p>
+        <form onSubmit={handlePassphraseSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <input
+            className="input-field"
+            placeholder="Enter passphrase..."
+            value={passphrase}
+            onChange={e => setPassphrase(e.target.value)}
+            autoCapitalize="none"
+          />
+          <button type="submit" className="btn-primary" disabled={loading || !passphrase.trim()}>
+            {loading ? 'Checking...' : 'Submit'}
+          </button>
+        </form>
+      </div>
 
       {completedCheckpoints.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>

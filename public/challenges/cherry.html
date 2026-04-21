@@ -18,11 +18,13 @@
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+    .success{color:var(--green);font-weight:bold}
+    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
   </style>
 </head>
 <body>
-  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
     <h1>Checkpoint 9 — Age Riddle</h1>
     <p class="muted">"The fairy poses a riddle of time..."</p>
@@ -33,16 +35,31 @@
     <p>In <strong>12 years</strong>, she will be exactly <strong>twice</strong> the apprentice's age.</p>
     <p style="color:var(--gold);margin-top:.25rem">How old is the elder RIGHT NOW?</p>
     <p class="muted">The elder's current age is your passphrase (just the number).</p>
-    <input id="cher" placeholder="Enter the elder's age..." type="number" min="0" max="200" />
-    <button onclick="checkCherry()">Check Answer</button>
-    <p id="cher-result"></p>
+  </div>
+  <div class="card" id="answer-card">
+    <p class="muted">Got it? Enter the elder's age:</p>
+    <input id="answer-input" placeholder="Enter the age..." type="number" min="0" max="200" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <button onclick="check()">Submit →</button>
+    <p id="error-msg" class="error"></p>
+    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
+    <div id="tries-list"></div>
   </div>
   <script>
-    function checkCherry() {
-      const val = document.getElementById('cher').value.trim();
-      const el = document.getElementById('cher-result');
-      if (val === '36') { el.className='success'; el.textContent='✓ Brilliant! Passphrase: 36'; }
-      else { el.className='error'; el.textContent="The math doesn't add up... try again, explorer."; }
+    const H='76a50887d8f1c2e9301755428990ad81479ee21c25b43215cf524541e0503269'
+    const tries=[]
+    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+    async function check(){
+      const inp=document.getElementById('answer-input')
+      const val=inp.value.trim()
+      if(!val)return
+      if(await sha256(val)===H){
+        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ Brilliant! The math checks out!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
+      }else{
+        tries.unshift(val);inp.value='';inp.focus()
+        document.getElementById('error-msg').textContent="The math doesn't add up... try again, explorer."
+        document.getElementById('tries-header').style.display='block'
+        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+      }
     }
   </script>
 </body>

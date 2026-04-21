@@ -17,11 +17,13 @@
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
-    .success{color:var(--green);font-size:.875rem;font-weight:bold}
+    .success{color:var(--green);font-weight:bold}
+    .try-item{color:var(--muted);font-size:.8rem;padding:.2rem 0;border-bottom:1px solid var(--border)}
+    .back-btn{display:block;background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border-radius:8px;width:100%;text-transform:uppercase;text-align:center;text-decoration:none;margin-top:.5rem}
   </style>
 </head>
 <body>
-  <img class="fairy" src="/assets/host.png" alt="Fairy" />
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
   <div class="card">
     <h1>Checkpoint 10 — The Mega Finale</h1>
     <p class="muted">"You've proven yourself worthy, explorer. But the magical orb is locked away..."</p>
@@ -33,19 +35,30 @@
     <p style="font-size:1.5rem;margin:.5rem 0">🏆</p>
     <p class="muted">"This is your moment, brave explorer. The jungle believes in you."<br/>— Fairy</p>
   </div>
-  <div class="card">
-    <p class="muted" style="margin-bottom:.25rem">After solving the mega challenge, enter your passphrase:</p>
-    <input id="lib" placeholder="Enter passphrase from organizer..." autocapitalize="characters" />
-    <button onclick="checkLibrary()">Submit</button>
-    <p id="lib-result"></p>
+  <div class="card" id="answer-card">
+    <p class="muted">After solving the mega challenge, enter your passphrase:</p>
+    <input id="answer-input" placeholder="Enter passphrase from organizer..." autocapitalize="none" autocomplete="off" onkeydown="if(event.key==='Enter')check()" />
+    <button onclick="check()">Submit →</button>
+    <p id="error-msg" class="error"></p>
+    <p id="tries-header" class="muted" style="display:none;font-size:.8rem;margin-top:.25rem">Previous tries:</p>
+    <div id="tries-list"></div>
   </div>
   <script>
-    const ANSWER = 'PLACEHOLDER_LIBRARY';
-    function checkLibrary() {
-      const val = document.getElementById('lib').value.trim().toUpperCase();
-      const el = document.getElementById('lib-result');
-      if (val === ANSWER) { el.className='success'; el.textContent='✓ You have conquered the jungle! Enter this passphrase in the app.'; }
-      else { el.className='error'; el.textContent="The safe remains locked... are you sure that's right?"; }
+    const H='9f70dafb07b9c620c9ea3087def654bc09331e95f58baea590c0d97448e1b77b'
+    const tries=[]
+    async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+    async function check(){
+      const inp=document.getElementById('answer-input')
+      const val=inp.value.trim()
+      if(!val)return
+      if(await sha256(val)===H){
+        document.getElementById('answer-card').innerHTML='<p class="success" style="text-align:center;font-size:1rem">✨ You have conquered the jungle!</p><a class="back-btn" href="/game?passphrase='+encodeURIComponent(val.toUpperCase())+'">Back to App →</a>'
+      }else{
+        tries.unshift(val);inp.value='';inp.focus()
+        document.getElementById('error-msg').textContent="The safe remains locked... are you sure that's right?"
+        document.getElementById('tries-header').style.display='block'
+        document.getElementById('tries-list').innerHTML=tries.map(t=>'<div class="try-item">✗ '+t+'</div>').join('')
+      }
     }
   </script>
 </body>
