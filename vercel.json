@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    { "source": "/challenges/e3a7f2b1.html", "destination": "/challenges/clover.html" },
+    { "source": "/challenges/d9c4e108.html", "destination": "/challenges/ash.html" },
+    { "source": "/challenges/5b2f8a3c.html", "destination": "/challenges/maple.html" },
+    { "source": "/challenges/7e1d4c9f.html", "destination": "/challenges/orchid.html" },
+    { "source": "/challenges/a4b6e20d.html", "destination": "/challenges/hickory.html" },
+    { "source": "/challenges/2c9f1b7e.html", "destination": "/challenges/glasgow.html" },
+    { "source": "/challenges/f8d3a5c2.html", "destination": "/challenges/iris.html" },
+    { "source": "/challenges/1a7e4b9d.html", "destination": "/challenges/violet.html" },
+    { "source": "/challenges/6f2c8d3a.html", "destination": "/challenges/cherry.html" },
+    { "source": "/challenges/b4e1f7c9.html", "destination": "/challenges/library.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
