@@ -30,6 +30,7 @@ export default function Registration() {
   const [adminPin, setAdminPin]     = useState('')
   const [adminError, setAdminError] = useState('')
   const [adminDone, setAdminDone]   = useState(false)
+  const [resetDone, setResetDone]   = useState(false)
 
   useEffect(() => {
     if (!player) return
@@ -107,6 +108,25 @@ export default function Registration() {
       setAdminError(rpcErr.message)
     } else {
       setAdminDone(true)
+      setAdminPin('')
+    }
+  }
+
+  async function handleAdminReset(e) {
+    e.preventDefault()
+    if (adminPin !== import.meta.env.VITE_LUCKY_DRAW_PIN) {
+      setAdminError('Wrong PIN.')
+      setAdminPin('')
+      return
+    }
+    setLoading(true)
+    setAdminError('')
+    const { error: rpcErr } = await supabase.rpc('admin_reset_game')
+    setLoading(false)
+    if (rpcErr) {
+      setAdminError(rpcErr.message)
+    } else {
+      setResetDone(true)
       setAdminPin('')
     }
   }
@@ -229,32 +249,42 @@ export default function Registration() {
         </button>
       ) : (
         <div className="card fade-in" style={{ width: '100%', maxWidth: 360, borderColor: 'var(--error)' }}>
-          <p style={{ fontSize: '0.8rem', color: 'var(--error)', fontWeight: 'bold' }}>
-            Delete All Participants
-          </p>
-          {adminDone ? (
-            <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>All participants deleted.</p>
-          ) : (
-            <form onSubmit={handleAdminClear} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <input
-                className="input-field"
-                type="password"
-                placeholder="Admin PIN..."
-                value={adminPin}
-                onChange={e => { setAdminPin(e.target.value); setAdminError('') }}
-                autoComplete="off"
-              />
-              {adminError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{adminError}</p>}
+          <input
+            className="input-field"
+            type="password"
+            placeholder="Admin PIN..."
+            value={adminPin}
+            onChange={e => { setAdminPin(e.target.value); setAdminError('') }}
+            autoComplete="off"
+          />
+          {adminError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{adminError}</p>}
+
+          {resetDone && <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>Game reset — all progress cleared.</p>}
+          {!resetDone && (
+            <button
+              onClick={handleAdminReset}
+              disabled={loading || !adminPin}
+              style={{ background: '#1a4a6e', color: '#7ec8f7', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: '1px solid #2a6a9e', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            >
+              {loading ? 'Resetting...' : 'Reset Game Progress'}
+            </button>
+          )}
+
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.6rem', marginTop: '0.2rem' }}>
+            {adminDone ? (
+              <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>All participants deleted.</p>
+            ) : (
               <button
-                type="submit"
+                onClick={handleAdminClear}
                 disabled={loading || !adminPin}
-                style={{ background: 'var(--error)', color: '#fff', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                style={{ background: 'var(--error)', color: '#fff', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', width: '100%' }}
               >
                 <Trash2 size={14} strokeWidth={2} /> {loading ? 'Deleting...' : 'Delete Everyone'}
               </button>
-            </form>
-          )}
-          <button className="btn-ghost" onClick={() => { setShowAdmin(false); setAdminPin(''); setAdminError(''); setAdminDone(false) }} style={{ fontSize: '0.8rem' }}>
+            )}
+          </div>
+
+          <button className="btn-ghost" onClick={() => { setShowAdmin(false); setAdminPin(''); setAdminError(''); setAdminDone(false); setResetDone(false) }} style={{ fontSize: '0.8rem' }}>
             Cancel
           </button>
         </div>
