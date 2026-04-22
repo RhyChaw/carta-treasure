@@ -11,6 +11,7 @@ export default function Victory() {
   const [timeDisplay, setTimeDisplay] = useState('')
   const [isFirst, setIsFirst] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
+  const [muted, setMuted] = useState(true)
 
   useEffect(() => {
     if (!player) { navigate('/'); return }
@@ -55,6 +56,7 @@ export default function Victory() {
               src="/assets/Fairy_Presents_Winner_Trophy_Video.mp4"
               autoPlay
               playsInline
+              muted={muted}
               onEnded={() => setShowVideo(false)}
               style={{
                 maxWidth: 380,
@@ -63,25 +65,38 @@ export default function Victory() {
                 boxShadow: '0 0 60px rgba(251,191,36,0.4)',
               }}
             />
-            <button
-              onClick={() => setShowVideo(false)}
-              style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '1.25rem',
-                background: 'rgba(255,255,255,0.15)',
-                color: '#fff',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: 20,
-                padding: '0.4rem 1rem',
-                fontSize: '0.8rem',
-                letterSpacing: '0.05em',
-                cursor: 'pointer',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
-              Skip →
-            </button>
+            <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => setMuted(m => !m)}
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: 20,
+                  padding: '0.4rem 1rem',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                {muted ? '🔇 Unmute' : '🔊 Mute'}
+              </button>
+              <button
+                onClick={() => setShowVideo(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: 20,
+                  padding: '0.4rem 1rem',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                Skip →
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
