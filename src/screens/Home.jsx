@@ -67,7 +67,7 @@ export default function Home() {
             </span>
           </div>
           <p style={{ fontWeight: 'bold', color: 'var(--text)', marginBottom: '0.3rem' }}>
-            Checkpoint {player.current_step + 1} · {currentCheckpoint.roomId}
+            Checkpoint {player.current_step + 1}
           </p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.5 }}>
             {currentCheckpoint.riddle.slice(0, 80)}...

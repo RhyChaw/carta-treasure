@@ -67,7 +67,7 @@ function CheckpointRow({ checkpoint, state, onTap, expanded }) {
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontWeight: 'bold', fontSize: '0.9rem', color: isLocked ? 'var(--text-muted)' : 'var(--text)' }}>
-            {isLocked ? '???' : checkpoint.roomId}
+            {isLocked ? '???' : isDone ? checkpoint.roomId : `Checkpoint ${checkpoint.index + 1}`}
           </p>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             {isDone ? 'Completed · tap to review' : isCurrent ? 'Your current quest' : 'Locked'}
