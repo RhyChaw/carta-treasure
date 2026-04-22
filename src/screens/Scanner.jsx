@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X } from 'lucide-react'
+import jsQR from 'jsqr'
 import { parseQrCode } from '../lib/checkpoints'
 
 export default function Scanner() {
   const navigate = useNavigate()
   const videoRef = useRef(null)
+  const canvasRef = useRef(null)
   const [manualCode, setManualCode] = useState('')
   const [error, setError] = useState('')
-  const detectorRef = useRef(null)
   const rafRef = useRef(null)
   const streamRef = useRef(null)
+  const doneRef = useRef(false)
 
   useEffect(() => {
     startCamera()
@@ -26,38 +28,42 @@ export default function Scanner() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream
         videoRef.current.play()
+        videoRef.current.addEventListener('playing', () => {
+          rafRef.current = requestAnimationFrame(scanFrame)
+        }, { once: true })
       }
-      if ('BarcodeDetector' in window) {
-        detectorRef.current = new BarcodeDetector({ formats: ['qr_code'] })
-        rafRef.current = requestAnimationFrame(scanFrame)
-      } else {
-        setError("QR scanner not supported in this browser. Use manual entry below.")
-      }
-    } catch (err) {
+    } catch {
       setError("Camera access denied. Use manual entry below.")
     }
   }
 
   function stopCamera() {
+    doneRef.current = true
     cancelAnimationFrame(rafRef.current)
     streamRef.current?.getTracks().forEach(t => t.stop())
   }
 
-  async function scanFrame() {
-    if (!videoRef.current || videoRef.current.readyState < 2) {
+  function scanFrame() {
+    if (doneRef.current) return
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || video.readyState < 2 || !canvas) {
       rafRef.current = requestAnimationFrame(scanFrame)
       return
     }
-    try {
-      const barcodes = await detectorRef.current.detect(videoRef.current)
-      if (barcodes.length > 0) {
-        const roomId = parseQrCode(barcodes[0].rawValue)
-        if (roomId) {
-          handleResult(roomId)
-          return
-        }
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(video, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    if (code?.data) {
+      const roomId = parseQrCode(code.data)
+      if (roomId) {
+        handleResult(roomId)
+        return
       }
-    } catch {}
+    }
     rafRef.current = requestAnimationFrame(scanFrame)
   }
 
@@ -80,6 +86,7 @@ export default function Scanner() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#000', display: 'flex', flexDirection: 'column' }}>
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
       <video
         ref={videoRef}
         style={{ flex: 1, objectFit: 'cover', width: '100%' }}
