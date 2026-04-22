@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkpoint 10 — Office Jungle Hunt</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35;--error:#ef4444}
     *{box-sizing:border-box;margin:0;padding:0}
@@ -194,7 +193,7 @@
 
 <script>
   const H = '563b1cfc8b15d2456747e24122524321f10093113c4bb35a5bea048ea0f54a6b'
-  let tries = 0, qrScanner = null
+  let tries = 0
 
   // ── Passphrase ──
   async function sha256(s) {
@@ -343,42 +342,6 @@
     }, 28)
   }
 
-  // ── Manual keyword fallback ──
-  function checkManual() {
-    const val = document.getElementById('manual-code').value.trim().toUpperCase()
-    if (val === 'ESPRESSO') {
-      window.location.href = '/challenges/espresso.html'
-    } else {
-      document.getElementById('manual-err').style.display = 'block'
-      document.getElementById('manual-code').value = ''
-      document.getElementById('manual-code').focus()
-    }
-  }
-
-  // ── QR Scanner ──
-  function openScanner() {
-    const btn = document.getElementById('scan-btn')
-    btn.disabled = true
-    btn.querySelector('span:last-child').textContent = 'Starting camera...'
-    document.getElementById('reader').style.display = 'block'
-
-    qrScanner = new Html5Qrcode('reader')
-    qrScanner.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 240, height: 240 } },
-      decodedText => {
-        qrScanner.stop().finally(() => { window.location.href = decodedText })
-      },
-      () => {}
-    ).then(() => {
-      btn.style.display = 'none'
-    }).catch(() => {
-      document.getElementById('reader').style.display = 'none'
-      document.getElementById('scan-err').style.display = 'block'
-      btn.disabled = false
-      btn.querySelector('span:last-child').textContent = 'Scan the Final QR'
-    })
-  }
 </script>
 
 </body>

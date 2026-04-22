@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Check, HelpCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
-import { CHECKPOINTS, getCheckpoint, validatePassphrase } from '../lib/checkpoints'
+import { CHECKPOINTS, getCheckpoint, validatePassphrase, parseQrCode } from '../lib/checkpoints'
 import ProgressBar from '../components/ProgressBar'
 import RiddleCard from '../components/RiddleCard'
 import Toast from '../components/Toast'
@@ -42,10 +42,11 @@ export default function Game() {
 
   function handleRoomFallback(e) {
     e.preventDefault()
-    if (roomInput.trim().toUpperCase() === currentCheckpoint?.roomId) {
+    const roomId = parseQrCode(roomInput)
+    if (roomId === currentCheckpoint?.roomId) {
       window.location.href = currentCheckpoint.challengeUrl
     } else {
-      setRoomError("That's not the right room — keep exploring!")
+      setRoomError("That's not the right phrase — are you in the right room?")
     }
   }
 
@@ -136,13 +137,13 @@ export default function Game() {
             onClick={() => { setShowFallback(f => !f); setRoomError('') }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem' }}
           >
-            <HelpCircle size={13} strokeWidth={2} /> Can't scan the QR code?
+            <HelpCircle size={13} strokeWidth={2} /> Found the room phrase?
           </button>
           {showFallback && (
             <form onSubmit={handleRoomFallback} style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <input
                 className="input-field"
-                placeholder="Type the room name..."
+                placeholder="Type the room phrase..."
                 value={roomInput}
                 onChange={e => { setRoomInput(e.target.value); setRoomError('') }}
                 autoCapitalize="characters"

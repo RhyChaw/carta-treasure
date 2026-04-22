@@ -46,7 +46,7 @@ export default function RiddleCard({ checkpoint, onScan }) {
           {showHint ? 'Hide Hint' : 'Need a Hint?'}
         </button>
         <button className="btn-primary" onClick={onScan} style={{ flex: 2 }}>
-          Scan QR Code
+          Enter Room Phrase
         </button>
       </div>
 
