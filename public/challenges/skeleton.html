@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏆 You Won! — Office Jungle Hunt</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:#000;color:#e8f5e2;font-family:'Courier New',monospace;min-height:100dvh;overflow-x:hidden}
+
+    /* ── Phase overlays ── */
+    .phase{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;transition:opacity .8s ease;pointer-events:none}
+    .phase.active{opacity:1;pointer-events:auto}
+    .phase.gone{opacity:0;pointer-events:none}
+
+    /* Phase 1 */
+    #ph1{z-index:100;background:#000;opacity:1}
+    #ph1-text{font-size:1.1rem;font-style:italic;color:#86a87a;opacity:0;transition:opacity 1.5s;text-align:center}
+    #ph1-img-wrap{opacity:0;transition:opacity 2s;margin-top:1.5rem}
+    #ph1-img{max-width:min(72vw,280px);border-radius:12px;filter:brightness(.12) saturate(0)}
+
+    /* Phase 2 */
+    #ph2{z-index:90;background:#000;opacity:0;gap:1.25rem}
+    .skel-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
+    #skel-main{max-width:min(78vw,340px);border-radius:12px;transition:filter 1.5s,opacity 1s;filter:brightness(.1)}
+    .particle{position:absolute;width:8px;height:8px;border-radius:50%;opacity:0;pointer-events:none}
+    @keyframes scatter{0%{opacity:.95;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+    .particle.fire{animation:scatter var(--dur) var(--delay) cubic-bezier(.25,0,.5,1) forwards}
+    #skel-msg{opacity:0;transition:opacity 1s;text-align:center;max-width:360px;padding:0 .5rem}
+    #skel-msg p{color:#86a87a;font-style:italic;font-size:.88rem;line-height:1.8}
+    #skel-msg strong{color:#e8f5e2;font-style:normal}
+
+    /* SVG key */
+    #key-wrap{opacity:0;transition:opacity 1s;text-align:center;margin-top:.5rem}
+    #key-svg{filter:drop-shadow(0 0 10px #FBBF24) drop-shadow(0 0 22px rgba(251,191,36,.5))}
+    #key-label{color:#FBBF24;font-size:.75rem;letter-spacing:.12em;margin-top:.4rem;opacity:0;transition:opacity .5s}
+    .kp{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Victory screen */
+    #victory{
+      position:relative;opacity:0;transition:opacity 1.5s;
+      min-height:100dvh;display:flex;flex-direction:column;
+      align-items:center;padding:1.5rem 1.25rem 3rem;gap:1.25rem;
+      background:#0A2A1B
+    }
+    #victory.show{opacity:1}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .float{animation:float 3s ease-in-out infinite}
+
+    .card{background:#0d3522;border:1px solid #1e5c35;border-radius:12px;padding:1.25rem;width:100%;max-width:440px}
+    .v-title{font-size:1.25rem;font-weight:bold;color:#FBBF24;text-align:center;letter-spacing:.04em;line-height:1.5}
+    .v-name{font-size:1rem;color:#e8f5e2;text-align:center;margin-top:.4rem}
+
+    @keyframes border-pulse{
+      0%,100%{box-shadow:0 0 14px rgba(74,222,128,.4),0 0 28px rgba(74,222,128,.15)}
+      50%{box-shadow:0 0 24px rgba(74,222,128,.7),0 0 48px rgba(74,222,128,.3)}
+    }
+    .glow-card{
+      background:#0d3522;border:2px solid #4ADE80;border-radius:12px;
+      padding:1.5rem 1.25rem;width:100%;max-width:440px;text-align:center;
+      animation:border-pulse 2.2s ease-in-out infinite
+    }
+    .passphrase{
+      font-size:2rem;font-weight:bold;color:#FBBF24;
+      letter-spacing:.15em;margin:.4rem 0;
+      text-shadow:0 0 14px rgba(251,191,36,.6),0 0 28px rgba(251,191,36,.25)
+    }
+    .complete-btn{
+      display:flex;align-items:center;justify-content:center;
+      background:#FBBF24;color:#0A2A1B;
+      font-family:'Courier New',monospace;font-size:.9rem;font-weight:bold;
+      padding:.75rem;border-radius:8px;text-decoration:none;
+      letter-spacing:.06em;margin-top:1rem;text-transform:uppercase
+    }
+    .leaderboard-btn{
+      display:flex;align-items:center;justify-content:center;
+      background:#4ADE80;color:#0A2A1B;
+      font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;
+      padding:.9rem 1.5rem;border:none;border-radius:8px;cursor:pointer;
+      text-decoration:none;text-align:center;text-transform:uppercase;
+      letter-spacing:.06em;min-height:48px;width:100%;max-width:440px
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Phase 1: Dark reveal -->
+  <div id="ph1" class="phase active">
+    <p id="ph1-text">You found them...</p>
+    <div id="ph1-img-wrap">
+      <img id="ph1-img" src="/assets/skeleton.png" alt="A skeleton at a desk" />
+    </div>
+  </div>
+
+  <!-- Phase 2: Skeleton + dissolve + key -->
+  <div id="ph2" class="phase">
+    <div class="skel-wrap" id="skel-wrap">
+      <img id="skel-main" src="/assets/skeleton.png" alt="Skeleton" />
+    </div>
+    <div id="skel-msg">
+      <p>
+        This explorer never took a break.<br/>
+        Never stepped away from the keyboard.<br/>
+        Never joined a treasure hunt.<br/><br/>
+        <strong>Don't be like them.</strong>
+      </p>
+    </div>
+    <div id="key-wrap">
+      <svg id="key-svg" viewBox="0 0 168 82" width="168" height="82" aria-hidden="true">
+        <circle id="kc" class="kp" cx="36" cy="41" r="27"
+          stroke-dasharray="170" stroke-dashoffset="170" />
+        <line id="ks" class="kp" x1="62" y1="41" x2="152" y2="41"
+          stroke-dasharray="90" stroke-dashoffset="90" />
+        <line id="kt1" class="kp" x1="112" y1="41" x2="112" y2="60"
+          stroke-dasharray="19" stroke-dashoffset="19" />
+        <line id="kt2" class="kp" x1="133" y1="41" x2="133" y2="54"
+          stroke-dasharray="13" stroke-dashoffset="13" />
+      </svg>
+      <p id="key-label">FREEDOM UNLOCKED</p>
+    </div>
+  </div>
+
+  <!-- Victory screen (underneath, scrollable) -->
+  <div id="victory">
+    <img src="/assets/host_front.png" alt="Fairy" style="width:76px" class="float" />
+
+    <div style="width:100%;max-width:440px">
+      <p class="v-title">🏆 THE JUNGLE IS CONQUERED! 🏆</p>
+      <p class="v-name" id="winner-name"></p>
+    </div>
+
+    <div class="card">
+      <p style="font-style:italic;color:#86a87a;font-size:.87rem;line-height:1.8">
+        "Don't burn yourself out to end up like our bony friend here.
+        Take breaks. Have fun. Enjoy the jungle — I mean, office."
+      </p>
+      <p style="margin-top:.75rem;font-size:.8rem;color:#FBBF24;text-align:right">— The Fairy ✨</p>
+    </div>
+
+    <div class="glow-card">
+      <p style="font-size:.72rem;color:#86a87a;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.2rem">Your Final Passphrase</p>
+      <p class="passphrase">FREEATLAST</p>
+      <p style="font-size:.8rem;color:#86a87a;line-height:1.6">
+        Type this into the treasure hunt app<br/>to complete your journey.
+      </p>
+      <a href="/game?passphrase=FREEATLAST" class="complete-btn">→ Complete in App</a>
+    </div>
+
+    <a href="/leaderboard" class="leaderboard-btn">View Leaderboard 🏆</a>
+  </div>
+
+<script>
+  // Player name from session
+  try {
+    const p = JSON.parse(sessionStorage.getItem('jungle_player') || '{}')
+    const name = p.name || ''
+    document.getElementById('winner-name').textContent =
+      name ? name + ', you escaped the office jungle!' : 'You escaped the office jungle!'
+  } catch(e) {}
+
+  const $ = id => document.getElementById(id)
+
+  // ── Particle system ──
+  const COLORS = ['#4ADE80','#FBBF24','#86a87a','#a3e3c0','#fde68a']
+  const wrap = $('skel-wrap')
+  const particles = []
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div')
+    el.className = 'particle'
+    const x = 8 + Math.random() * 84
+    const y = 8 + Math.random() * 84
+    const angle = Math.random() * Math.PI * 2
+    const dist = 90 + Math.random() * 120
+    const tx = Math.cos(angle) * dist
+    const ty = Math.sin(angle) * dist
+    const dur = (.7 + Math.random() * .7) + 's'
+    const delay = (Math.random() * .35) + 's'
+    el.style.cssText = `left:${x}%;top:${y}%;background:${COLORS[i % COLORS.length]};--tx:${tx}px;--ty:${ty}px;--dur:${dur};--delay:${delay}`
+    wrap.appendChild(el)
+    particles.push(el)
+  }
+
+  function fireParticles() {
+    particles.forEach(p => {
+      p.classList.remove('fire')
+      void p.offsetWidth
+      p.classList.add('fire')
+    })
+  }
+
+  // ── Key animation ──
+  function animateKey() {
+    const ease = 'stroke-dashoffset'
+    const bow = $('kc'), shaft = $('ks'), t1 = $('kt1'), t2 = $('kt2')
+    bow.style.transition = ease + ' 1.1s ease'
+    bow.style.strokeDashoffset = '0'
+    setTimeout(() => {
+      shaft.style.transition = ease + ' .5s ease'
+      shaft.style.strokeDashoffset = '0'
+    }, 900)
+    setTimeout(() => {
+      t1.style.transition = ease + ' .25s ease'
+      t1.style.strokeDashoffset = '0'
+      t2.style.transition = ease + ' .25s ease'
+      t2.style.strokeDashoffset = '0'
+    }, 1350)
+    setTimeout(() => { $('key-label').style.opacity = '1' }, 1800)
+  }
+
+  // ── Confetti ──
+  const C = ['#4ADE80','#FBBF24','#86a87a','#0d3522','#a3e3c0','#fde68a']
+  function bang(opts) { window.confetti({ colors: C, ...opts }) }
+
+  function startConfetti() {
+    bang({ particleCount: 120, spread: 100, origin: { y: .55 } })
+    setTimeout(() => bang({ particleCount: 60, spread: 80, origin: { x: .15, y: .65 } }), 400)
+    setTimeout(() => bang({ particleCount: 60, spread: 80, origin: { x: .85, y: .65 } }), 700)
+    let n = 0
+    const iv = setInterval(() => {
+      bang({ particleCount: 35, spread: 65, origin: { x: Math.random(), y: .3 + Math.random() * .4 } })
+      if (++n >= 5) clearInterval(iv)
+    }, 2000)
+  }
+
+  // ── Flash effect ──
+  function flashGreen() {
+    document.body.style.transition = 'background .15s'
+    document.body.style.background = '#1a5c2a'
+    setTimeout(() => { document.body.style.background = '#000' }, 200)
+    setTimeout(() => { document.body.style.transition = '' }, 400)
+  }
+
+  // ── Timeline ──
+
+  // Phase 1: 0 → 3s
+  setTimeout(() => { $('ph1-text').style.opacity = '1' }, 250)
+  setTimeout(() => { $('ph1-img-wrap').style.opacity = '1' }, 1400)
+
+  // → Phase 2: 3s
+  setTimeout(() => {
+    $('ph1').style.opacity = '0'
+    $('ph2').style.opacity = '1'
+  }, 3000)
+  setTimeout(() => { $('ph1').classList.add('gone') }, 3900)
+
+  // Skeleton brightens: 3.8s
+  setTimeout(() => {
+    $('skel-main').style.filter = 'brightness(1)'
+  }, 3800)
+
+  // Message fades in: 5s
+  setTimeout(() => { $('skel-msg').style.opacity = '1' }, 5000)
+
+  // Dissolve: 7s
+  setTimeout(() => {
+    $('skel-main').style.opacity = '0'
+    $('skel-msg').style.opacity = '0'
+    fireParticles()
+  }, 7000)
+
+  // Key appears + draws: 8.5s
+  setTimeout(() => {
+    $('key-wrap').style.opacity = '1'
+    animateKey()
+  }, 8500)
+
+  // Flash: 10.2s
+  setTimeout(flashGreen, 10200)
+
+  // → Victory: 10.8s
+  setTimeout(() => {
+    $('ph2').style.opacity = '0'
+    $('victory').classList.add('show')
+    document.body.style.background = '#0A2A1B'
+    setTimeout($('ph2').classList.add.bind($('ph2').classList, 'gone'), 900)
+    startConfetti()
+  }, 10800)
+</script>
+</body>
+</html>

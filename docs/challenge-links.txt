@@ -1,11 +1,33 @@
-OFFICE JUNGLE HUNT — CHALLENGE QR CODE LINKS
-=============================================
-Make a QR code pointing to each URL below and
-place it at the corresponding room.
+OFFICE JUNGLE HUNT — QR CODE LINKS
+====================================
 
-URLs are obfuscated — don't share these publicly.
-Players who can't scan can type the ROOM NAME in
-the app as a fallback (e.g. "CLOVER").
+╔══════════════════════════════════════════════╗
+║   10 ROOM QR CODES  (encode as JUNGLE_HUNT_) ║
+╚══════════════════════════════════════════════╝
+
+These are scanned INSIDE the main app's QR scanner.
+Encode the string EXACTLY as shown — NOT a web link.
+
+Checkpoint 1  — CLOVER    →  JUNGLE_HUNT_CLOVER
+Checkpoint 2  — ASH       →  JUNGLE_HUNT_ASH
+Checkpoint 3  — MAPLE     →  JUNGLE_HUNT_MAPLE
+Checkpoint 4  — ORCHID    →  JUNGLE_HUNT_ORCHID
+Checkpoint 5  — HICKORY   →  JUNGLE_HUNT_HICKORY
+Checkpoint 6  — GLASGOW   →  JUNGLE_HUNT_GLASGOW
+Checkpoint 7  — IRIS      →  JUNGLE_HUNT_IRIS
+Checkpoint 8  — VIOLET    →  JUNGLE_HUNT_VIOLET
+Checkpoint 9  — CHERRY    →  JUNGLE_HUNT_CHERRY
+Checkpoint 10 — LIBRARY   →  JUNGLE_HUNT_LIBRARY
+
+QR FALLBACK: Players who can't scan type the ROOM NAME in the
+app instead (e.g. "CLOVER", "MAPLE", "LIBRARY", etc.)
+
+
+╔══════════════════════════════════════════════╗
+║   10 CHALLENGE PAGE LINKS  (obfuscated URLs) ║
+╚══════════════════════════════════════════════╝
+
+Organizer debug reference — obfuscated paths only.
 
 Checkpoint 1 — CLOVER
 https://treasure-hunt-carta.netlify.app/challenges/e3a7f2b1.html
@@ -36,3 +58,34 @@ https://treasure-hunt-carta.netlify.app/challenges/6f2c8d3a.html
 
 Checkpoint 10 — LIBRARY
 https://treasure-hunt-carta.netlify.app/challenges/b4e1f7c9.html
+
+
+╔══════════════════════════════════════════════╗
+║   2 FINALE CHAIN LINKS  (direct web URLs)    ║
+╚══════════════════════════════════════════════╝
+
+Print and encode these as QR codes linking to the URLs.
+Place them at the physical locations.
+
+ESPRESSO MACHINE
+→ Tape to side of machine or drip tray
+https://treasure-hunt-carta.netlify.app/challenges/espresso.html
+
+SKELETON DESK
+→ Place on skeleton / desk / around neck as a badge
+https://treasure-hunt-carta.netlify.app/challenges/skeleton.html
+
+
+╔══════════════════════════════════════════════╗
+║   FINALE FLOW SUMMARY                        ║
+╚══════════════════════════════════════════════╝
+
+1. Player scans JUNGLE_HUNT_LIBRARY in the app
+2. App unlocks Library checkpoint, shows passphrase prompt
+3. Player opens the library challenge page (link in app)
+   → Sabrina Carpenter hint: "find where it's MADE"
+4. Player walks to espresso machine, scans QR there
+   → Opens espresso.html: points to skeleton across from Violet
+5. Player finds skeleton, scans QR on/near skeleton
+   → Opens skeleton.html: full victory animation + passphrase FREEATLAST
+6. Player types FREEATLAST back in the app to complete the hunt

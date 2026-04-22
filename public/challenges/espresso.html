@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>☕ Sacred Brew — Office Jungle Hunt</title>
+  <style>
+    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem 2.5rem;gap:1.25rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px}
+    p{line-height:1.7;font-size:.9rem}
+    .muted{color:var(--muted);font-style:italic}
+    .gold{color:var(--gold);font-weight:bold}
+    .green{color:var(--green);font-weight:bold}
+    .sep{border:none;border-top:1px solid var(--border);margin:.6rem 0}
+    .badge{font-size:.65rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .5rem;border-radius:4px;background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .fairy{width:48px;animation:float 3.5s ease-in-out infinite}
+
+    /* Coffee cup steam animation */
+    .cup-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center;margin:.5rem 0}
+    .steam-container{display:flex;gap:6px;align-items:flex-end;margin-bottom:4px;height:28px}
+    .steam{width:4px;background:linear-gradient(to top,var(--muted),transparent);border-radius:4px;transform-origin:bottom center}
+    @keyframes steam1{0%,100%{transform:scaleX(1) translateY(0);opacity:.7}50%{transform:scaleX(1.6) translateY(-8px);opacity:.25}}
+    @keyframes steam2{0%,100%{transform:scaleX(1) translateY(0);opacity:.7}50%{transform:scaleX(1.4) translateY(-10px);opacity:.2}}
+    @keyframes steam3{0%,100%{transform:scaleX(1) translateY(0);opacity:.7}50%{transform:scaleX(1.8) translateY(-7px);opacity:.25}}
+    .s1{height:18px;animation:steam1 1.8s ease-in-out infinite}
+    .s2{height:24px;animation:steam2 2s ease-in-out infinite .3s}
+    .s3{height:16px;animation:steam3 1.6s ease-in-out infinite .6s}
+    .cup-emoji{font-size:2.5rem;line-height:1}
+
+    .dialogue{background:#071e12;border-radius:8px;padding:.9rem 1rem;margin:.5rem 0;font-style:italic;color:var(--muted);border:1px solid var(--border)}
+    .dialogue strong{color:var(--text);font-style:normal}
+
+    .vine-callout{background:#071e12;border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:.8rem 1rem;margin:.6rem 0;font-size:.9rem;line-height:1.8}
+
+    #typed-line{color:var(--text);font-style:normal}
+    #cursor{display:inline-block;width:2px;height:1em;background:var(--green);vertical-align:middle;animation:blink .7s step-end infinite;margin-left:1px}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    .hint-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Courier New',monospace;font-size:.8rem;padding:.55rem 1rem;border-radius:8px;cursor:pointer;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s}
+    .hint-btn:hover{border-color:var(--gold)}
+    .hint-content{overflow:hidden;max-height:0;transition:max-height .4s ease}
+    .hint-content.open{max-height:200px}
+    .hint-inner{padding:.75rem 0 0;font-size:.83rem;color:var(--muted);line-height:1.7}
+    .hint-inner span{color:var(--gold)}
+  </style>
+</head>
+<body>
+
+  <div style="display:flex;align-items:center;gap:1rem;width:100%;max-width:440px">
+    <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
+    <div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+        <p style="color:var(--green);font-size:1rem;letter-spacing:.06em;text-transform:uppercase;font-weight:bold">The Sacred Brew</p>
+        <span class="badge">FINALE CHAIN</span>
+      </div>
+      <p style="font-size:.78rem;color:var(--muted)">You're getting close, explorer...</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="text-align:center;margin-bottom:.75rem">
+      <div class="cup-wrap">
+        <div class="steam-container">
+          <div class="steam s1"></div>
+          <div class="steam s2"></div>
+          <div class="steam s3"></div>
+        </div>
+        <div class="cup-emoji">☕</div>
+      </div>
+      <p style="color:var(--green);font-size:.95rem;font-weight:bold;margin-top:.25rem">You found the source of the sacred brew!</p>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:.5rem 0">
+
+    <div class="dialogue">
+      The fairy takes a sip and grimaces.<br/><br/>
+      <strong>"Delicious... but dangerous. Too much of this and you end up like... well..."</strong>
+      <br/><br/>
+      She points to something across the office:
+    </div>
+
+    <div class="vine-callout">
+      "Remember the <span class="green">EASTERN VINE</span>? Five flowers, top to bottom. You visited the very top — the shy purple bloom.<br/><br/>
+      Look <span class="gold">ACROSS</span> from there."
+    </div>
+
+    <p style="margin:.6rem 0;color:var(--muted);font-style:italic">The fairy lowers her voice...</p>
+
+    <div class="dialogue" id="dramatic-block">
+      "Someone has been sitting at their desk FAR too long.<br/>
+      A permanent employee.<br/><br/>
+      <span id="typed-line"></span><span id="cursor"></span>"
+    </div>
+
+    <p style="margin:.5rem 0;color:var(--text);font-weight:bold">Find them. Scan them. End this.</p>
+  </div>
+
+  <div class="card">
+    <button class="hint-btn" onclick="toggleHint()" id="hint-toggle-btn">
+      <span>💡 Need a hint?</span>
+      <span id="hint-arrow">▼</span>
+    </button>
+    <div class="hint-content" id="hint-content">
+      <div class="hint-inner">
+        <span>HINT:</span> Across from Violet. You can't miss them.<br/>
+        They're all bones and no flesh.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Typing effect for dramatic lines
+    const line = "They never take breaks. They never go home."
+    const el = document.getElementById('typed-line')
+    const cursor = document.getElementById('cursor')
+    let idx = 0
+    let started = false
+
+    function startTyping() {
+      if (started) return
+      started = true
+      const interval = setInterval(() => {
+        if (idx < line.length) {
+          el.textContent += line[idx]
+          idx++
+        } else {
+          clearInterval(interval)
+          // blink cursor for a moment then hide it
+          setTimeout(() => { cursor.style.display = 'none' }, 2000)
+        }
+      }, 55)
+    }
+
+    // Start typing after a short dramatic pause
+    setTimeout(startTyping, 1200)
+
+    // Hint toggle
+    let hintOpen = false
+    function toggleHint() {
+      hintOpen = !hintOpen
+      document.getElementById('hint-content').classList.toggle('open', hintOpen)
+      document.getElementById('hint-arrow').textContent = hintOpen ? '▲' : '▼'
+      document.getElementById('hint-toggle-btn').style.borderColor = hintOpen ? 'var(--gold)' : 'var(--border)'
+    }
+  </script>
+
+</body>
+</html>
