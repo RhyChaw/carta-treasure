@@ -152,6 +152,39 @@
   </div>
 
 <script>
+  // ── HARD GATE: must have completed ALL 10 checkpoints (steps 0–9) ──
+  ;(function(){
+    try {
+      var d = sessionStorage.getItem('jungle_player')
+      var p = d ? JSON.parse(d) : null
+
+      // No session at all → block
+      if (!p) {
+        document.body.style.cssText = 'background:#000;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;font-family:Courier New,monospace;text-align:center;gap:1rem;color:#e8f5e2'
+        document.body.innerHTML =
+          '<p style="font-size:2rem">🔒</p>'
+          + '<p style="color:#ef4444;font-size:1.1rem;font-weight:bold;letter-spacing:.04em">ACCESS DENIED</p>'
+          + '<p style="color:#666;font-size:.85rem;max-width:300px;line-height:1.6">You need to be registered in the treasure hunt app to reach this page.</p>'
+          + '<a href="/" style="color:#FBBF24;font-size:.85rem;text-decoration:none;margin-top:.5rem">← Back to the hunt</a>'
+        return
+      }
+
+      // Has session but hasn't finished all prior checkpoints → block hard
+      if (p.current_step < 9) {
+        var remaining = 9 - p.current_step
+        document.body.style.cssText = 'background:#000;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;font-family:Courier New,monospace;text-align:center;gap:1rem;color:#e8f5e2'
+        document.body.innerHTML =
+          '<p style="font-size:2rem">💀</p>'
+          + '<p style="color:#ef4444;font-size:1.15rem;font-weight:bold;letter-spacing:.05em">THE SKELETON IS NOT READY FOR YOU.</p>'
+          + '<p style="color:#555;font-size:.9rem;max-width:320px;line-height:1.7;margin-top:.25rem">Only those who have completed <strong style="color:#888">every challenge</strong> in the jungle may face the final guardian.</p>'
+          + '<p style="color:#333;font-size:.8rem;margin-top:.25rem">You still have <strong style="color:#666">' + remaining + ' checkpoint' + (remaining > 1 ? 's' : '') + '</strong> to complete.</p>'
+          + '<a href="/" style="color:#FBBF24;font-size:.85rem;text-decoration:none;margin-top:.75rem">← Back to the hunt</a>'
+        return
+      }
+
+    } catch(e) {}
+  })()
+
   // Player name from session
   try {
     const p = JSON.parse(sessionStorage.getItem('jungle_player') || '{}')
