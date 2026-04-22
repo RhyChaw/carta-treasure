@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check, HelpCircle } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint, validatePassphrase, parseQrCode } from '../lib/checkpoints'
@@ -15,7 +15,6 @@ export default function Game() {
   const [passphrase, setPassphrase] = useState(() => searchParams.get('passphrase') ?? '')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
-  const [showFallback, setShowFallback] = useState(false)
   const [roomInput, setRoomInput] = useState('')
   const [roomError, setRoomError] = useState('')
   useEffect(() => {
@@ -129,32 +128,24 @@ export default function Game() {
         </form>
       </div>
 
-      {/* QR fallback */}
       {currentCheckpoint && (
-        <div>
-          <button
-            className="btn-ghost"
-            onClick={() => { setShowFallback(f => !f); setRoomError('') }}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem' }}
-          >
-            <HelpCircle size={13} strokeWidth={2} /> Found the room phrase?
-          </button>
-          {showFallback && (
-            <form onSubmit={handleRoomFallback} style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <input
-                className="input-field"
-                placeholder="Type the room phrase..."
-                value={roomInput}
-                onChange={e => { setRoomInput(e.target.value); setRoomError('') }}
-                autoCapitalize="characters"
-                style={{ fontSize: '0.9rem' }}
-              />
-              {roomError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{roomError}</p>}
-              <button type="submit" className="btn-secondary" disabled={!roomInput.trim()}>
-                Open Challenge →
-              </button>
-            </form>
-          )}
+        <div className="card">
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
+            "Found the phrase in the room? Enter it here..."
+          </p>
+          <form onSubmit={handleRoomFallback} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <input
+              className="input-field"
+              placeholder="Type the room phrase..."
+              value={roomInput}
+              onChange={e => { setRoomInput(e.target.value); setRoomError('') }}
+              autoCapitalize="characters"
+            />
+            {roomError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{roomError}</p>}
+            <button type="submit" className="btn-secondary" disabled={!roomInput.trim()}>
+              Open Challenge →
+            </button>
+          </form>
         </div>
       )}
 

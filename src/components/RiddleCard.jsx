@@ -45,9 +45,6 @@ export default function RiddleCard({ checkpoint, onScan }) {
         >
           {showHint ? 'Hide Hint' : 'Need a Hint?'}
         </button>
-        <button className="btn-primary" onClick={onScan} style={{ flex: 2 }}>
-          Enter Room Phrase
-        </button>
       </div>
 
       {checkpoint.challengeUrl && (
