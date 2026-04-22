@@ -155,7 +155,7 @@
   // ── HARD GATE: must have completed ALL 10 checkpoints (steps 0–9) ──
   ;(function(){
     try {
-      var d = sessionStorage.getItem('jungle_player')
+      var d = localStorage.getItem('jungle_player')
       var p = d ? JSON.parse(d) : null
 
       // No session at all → block
@@ -187,7 +187,7 @@
 
   // Player name from session
   try {
-    const p = JSON.parse(sessionStorage.getItem('jungle_player') || '{}')
+    const p = JSON.parse(localStorage.getItem('jungle_player') || '{}')
     const name = p.name || ''
     document.getElementById('winner-name').textContent =
       name ? name + ', you escaped the office jungle!' : 'You escaped the office jungle!'

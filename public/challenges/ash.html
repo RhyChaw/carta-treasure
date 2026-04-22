@@ -50,7 +50,7 @@
   ;(function(){
     var EX=1;
     try{
-      var d=sessionStorage.getItem('jungle_player');
+      var d=localStorage.getItem('jungle_player');
       var p=d?JSON.parse(d):null;
       if(!p)return;
       if(p.current_step<EX){

@@ -5,7 +5,7 @@ const PlayerContext = createContext(null)
 export function PlayerProvider({ children }) {
   const [player, setPlayer] = useState(() => {
     try {
-      const saved = sessionStorage.getItem('jungle_player')
+      const saved = localStorage.getItem('jungle_player')
       return saved ? JSON.parse(saved) : null
     } catch {
       return null
@@ -14,9 +14,9 @@ export function PlayerProvider({ children }) {
 
   useEffect(() => {
     if (player) {
-      sessionStorage.setItem('jungle_player', JSON.stringify(player))
+      localStorage.setItem('jungle_player', JSON.stringify(player))
     } else {
-      sessionStorage.removeItem('jungle_player')
+      localStorage.removeItem('jungle_player')
     }
   }, [player])
 
