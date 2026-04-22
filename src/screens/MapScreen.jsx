@@ -1,9 +1,12 @@
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint } from '../lib/checkpoints'
+import { useStuckTimer } from '../lib/useStuckTimer'
 import MapView from '../components/MapView'
 
 export default function MapScreen() {
   const { player } = usePlayer()
+  const isStuck = useStuckTimer(player)
+
   if (!player) return null
 
   const completedRooms = CHECKPOINTS
@@ -22,6 +25,7 @@ export default function MapScreen() {
       <MapView
         completedRooms={completedRooms}
         currentRoom={currentCheckpoint?.roomId}
+        highlightRoom={isStuck}
       />
     </div>
   )

@@ -43,11 +43,12 @@ export default function Victory() {
             style={{
               position: 'fixed',
               inset: 0,
-              background: '#000',
+              background: 'rgba(0,0,0,0.92)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 200,
+              padding: '2rem 1.5rem',
             }}
           >
             <video
@@ -56,9 +57,10 @@ export default function Victory() {
               playsInline
               onEnded={() => setShowVideo(false)}
               style={{
+                maxWidth: 380,
                 width: '100%',
-                height: '100%',
-                objectFit: 'cover',
+                borderRadius: 16,
+                boxShadow: '0 0 60px rgba(251,191,36,0.4)',
               }}
             />
             <button

@@ -183,8 +183,8 @@ AS $$
 DECLARE
   deleted_count INTEGER;
 BEGIN
-  DELETE FROM public.progress;
-  DELETE FROM public.players;
+  DELETE FROM public.progress WHERE true;
+  DELETE FROM public.players WHERE true;
   GET DIAGNOSTICS deleted_count = ROW_COUNT;
   RETURN deleted_count;
 END;

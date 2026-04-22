@@ -62,7 +62,7 @@ function applyTransform(t, lat, lng) {
 
 const TRANSFORM = GPS_CALIBRATED ? buildTransform(GPS_REFS) : null
 
-export default function MapView({ completedRooms = [], currentRoom }) {
+export default function MapView({ completedRooms = [], currentRoom, highlightRoom = false }) {
   const containerRef = useRef(null)
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
   const [userPos, setUserPos] = useState(null)
@@ -91,6 +91,7 @@ export default function MapView({ completedRooms = [], currentRoom }) {
 
   const userMapPos = userPos && TRANSFORM ? applyTransform(TRANSFORM, userPos.lat, userPos.lng) : null
   const userVisible = userMapPos && userMapPos.xPct >= 0 && userMapPos.xPct <= 100 && userMapPos.yPct >= 0 && userMapPos.yPct <= 100
+  const outsideOffice = userPos && TRANSFORM && !userVisible
 
   function getPinColor(roomId) {
     if (completedRooms.includes(roomId)) return '#4ADE80'
@@ -137,21 +138,23 @@ export default function MapView({ completedRooms = [], currentRoom }) {
                 left: `${pin.x}%`,
                 top: `${pin.y}%`,
                 transform: 'translate(-50%, -50%)',
-                width: isCurrent ? 22 : 18,
-                height: isCurrent ? 22 : 18,
+                width: isCurrent && highlightRoom ? 28 : isCurrent ? 22 : 18,
+                height: isCurrent && highlightRoom ? 28 : isCurrent ? 22 : 18,
                 borderRadius: '50%',
                 background: getPinColor(roomId),
-                border: `2px solid ${isCurrent ? '#fff' : 'rgba(0,0,0,0.4)'}`,
+                border: `${isCurrent && highlightRoom ? 3 : 2}px solid ${isCurrent ? '#fff' : 'rgba(0,0,0,0.4)'}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 8,
+                fontSize: isCurrent && highlightRoom ? 10 : 8,
                 color: '#0A2A1B',
                 fontWeight: 'bold',
                 cursor: 'default',
                 animation: isCurrent ? 'pulse-glow 2s ease-in-out infinite' : 'none',
                 zIndex: isCurrent ? 2 : 1,
-                boxShadow: isCurrent ? '0 0 8px #FBBF24' : 'none',
+                boxShadow: isCurrent && highlightRoom
+                  ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24'
+                  : isCurrent ? '0 0 8px #FBBF24' : 'none',
               }}
             >
               {getPinLabel(roomId)}
@@ -201,7 +204,12 @@ export default function MapView({ completedRooms = [], currentRoom }) {
         <span style={{ color: '#374151' }}>● Undiscovered</span>
         {GPS_CALIBRATED && <span style={{ color: '#3B82F6' }}>● You</span>}
       </div>
-      {userPos && (
+      {outsideOffice && (
+        <div style={{ padding: '0.4rem 0.75rem 0.6rem', fontSize: '0.78rem', color: '#FBBF24', fontWeight: 'bold' }}>
+          You are outside the office
+        </div>
+      )}
+      {userPos && !outsideOffice && (
         <div style={{ padding: '0.25rem 0.75rem 0.5rem', fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>
           GPS: {userPos.lat.toFixed(7)}, {userPos.lng.toFixed(7)} (±{Math.round(userPos.accuracy)}m)
         </div>

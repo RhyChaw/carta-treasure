@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check } from 'lucide-react'
+import { Check, HelpCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../lib/playerContext'
 import { CHECKPOINTS, getCheckpoint, validatePassphrase } from '../lib/checkpoints'
@@ -15,6 +15,9 @@ export default function Game() {
   const [passphrase, setPassphrase] = useState(() => searchParams.get('passphrase') ?? '')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
+  const [showFallback, setShowFallback] = useState(false)
+  const [roomInput, setRoomInput] = useState('')
+  const [roomError, setRoomError] = useState('')
   useEffect(() => {
     if (!player) navigate('/')
   }, [player, navigate])
@@ -35,6 +38,15 @@ export default function Game() {
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type })
     setTimeout(() => setToast(t => ({ ...t, visible: false })), 3500)
+  }
+
+  function handleRoomFallback(e) {
+    e.preventDefault()
+    if (roomInput.trim().toUpperCase() === currentCheckpoint?.roomId) {
+      window.location.href = currentCheckpoint.challengeUrl
+    } else {
+      setRoomError("That's not the right room — keep exploring!")
+    }
   }
 
   async function handlePassphraseSubmit(e) {
@@ -89,7 +101,7 @@ export default function Game() {
 
   return (
     <div className="screen">
-      <Toast {...toast} />
+      <Toast {...toast} onDismiss={() => setToast(t => ({ ...t, visible: false }))} />
 
       <ProgressBar current={player.current_step} total={CHECKPOINTS.length} />
 
@@ -115,6 +127,35 @@ export default function Game() {
           </button>
         </form>
       </div>
+
+      {/* QR fallback */}
+      {currentCheckpoint && (
+        <div>
+          <button
+            className="btn-ghost"
+            onClick={() => { setShowFallback(f => !f); setRoomError('') }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem' }}
+          >
+            <HelpCircle size={13} strokeWidth={2} /> Can't scan the QR code?
+          </button>
+          {showFallback && (
+            <form onSubmit={handleRoomFallback} style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <input
+                className="input-field"
+                placeholder="Type the room name..."
+                value={roomInput}
+                onChange={e => { setRoomInput(e.target.value); setRoomError('') }}
+                autoCapitalize="characters"
+                style={{ fontSize: '0.9rem' }}
+              />
+              {roomError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{roomError}</p>}
+              <button type="submit" className="btn-secondary" disabled={!roomInput.trim()}>
+                Open Challenge →
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       {completedCheckpoints.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>

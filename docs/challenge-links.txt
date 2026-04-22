@@ -3,32 +3,36 @@ OFFICE JUNGLE HUNT — CHALLENGE QR CODE LINKS
 Make a QR code pointing to each URL below and
 place it at the corresponding room.
 
+URLs are obfuscated — don't share these publicly.
+Players who can't scan can type the ROOM NAME in
+the app as a fallback (e.g. "CLOVER").
+
 Checkpoint 1 — CLOVER
-https://treasure-hunt-carta.netlify.app/challenges/clover.html
+https://treasure-hunt-carta.netlify.app/challenges/e3a7f2b1.html
 
 Checkpoint 2 — ASH
-https://treasure-hunt-carta.netlify.app/challenges/ash.html
+https://treasure-hunt-carta.netlify.app/challenges/d9c4e108.html
 
 Checkpoint 3 — MAPLE
-https://treasure-hunt-carta.netlify.app/challenges/maple.html
+https://treasure-hunt-carta.netlify.app/challenges/5b2f8a3c.html
 
 Checkpoint 4 — ORCHID
-https://treasure-hunt-carta.netlify.app/challenges/orchid.html
+https://treasure-hunt-carta.netlify.app/challenges/7e1d4c9f.html
 
 Checkpoint 5 — HICKORY
-https://treasure-hunt-carta.netlify.app/challenges/hickory.html
+https://treasure-hunt-carta.netlify.app/challenges/a4b6e20d.html
 
 Checkpoint 6 — GLASGOW
-https://treasure-hunt-carta.netlify.app/challenges/glasgow.html
+https://treasure-hunt-carta.netlify.app/challenges/2c9f1b7e.html
 
 Checkpoint 7 — IRIS
-https://treasure-hunt-carta.netlify.app/challenges/iris.html
+https://treasure-hunt-carta.netlify.app/challenges/f8d3a5c2.html
 
 Checkpoint 8 — VIOLET
-https://treasure-hunt-carta.netlify.app/challenges/violet.html
+https://treasure-hunt-carta.netlify.app/challenges/1a7e4b9d.html
 
 Checkpoint 9 — CHERRY
-https://treasure-hunt-carta.netlify.app/challenges/cherry.html
+https://treasure-hunt-carta.netlify.app/challenges/6f2c8d3a.html
 
 Checkpoint 10 — LIBRARY
-https://treasure-hunt-carta.netlify.app/challenges/library.html
+https://treasure-hunt-carta.netlify.app/challenges/b4e1f7c9.html
