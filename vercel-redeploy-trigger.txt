@@ -1,0 +1,3 @@
+Vercel redeploy trigger.
+
+Update this file (any change) and push to trigger a fresh Vercel build.
