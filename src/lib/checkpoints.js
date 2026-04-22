@@ -118,7 +118,7 @@ const CATCHPHRASES = {
 
 export function parseQrCode(raw) {
   if (!raw) return null
-  const normalized = raw.trim().toUpperCase()
+  const normalized = raw.trim().replace(/\s+/g, ' ').toUpperCase()
   if (normalized.startsWith('JUNGLE_HUNT_')) return normalized.replace('JUNGLE_HUNT_', '')
   return CATCHPHRASES[normalized] ?? null
 }

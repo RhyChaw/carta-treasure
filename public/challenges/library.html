@@ -205,7 +205,7 @@
     const inp = document.getElementById('answer')
     const val = inp.value.trim()
     if (!val) return
-    if (await sha256(val.toUpperCase()) === H) {
+    if (await sha256(val.trim().replace(/\s+/g, ' ').toUpperCase()) === H) {
       beginFalseHope()
     } else {
       tries++
