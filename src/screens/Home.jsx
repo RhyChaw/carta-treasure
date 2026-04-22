@@ -1,4 +1,4 @@
-// v2
+// v3
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Crown, Leaf, Map, Trophy, Dices } from 'lucide-react'
