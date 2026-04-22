@@ -49,6 +49,15 @@ export default function Registration() {
     setLoading(true)
     setError('')
     try {
+      const { count } = await supabase
+        .from('players')
+        .select('id', { count: 'exact', head: true })
+        .ilike('name', name.trim())
+      if (count > 0) {
+        setError(`"${name.trim()}" is already taken — add your last name or a number to make it unique.`)
+        setLoading(false)
+        return
+      }
       const password_hash = await sha256(password)
       const { data, error: dbError } = await supabase
         .from('players')
