@@ -22,7 +22,7 @@ export const CHECKPOINTS = [
     roomId: 'MAPLE',
     passphrase: 'CROMWELL DISSOLVES THE RUMP PARLIAMENT',
     riddle:
-      "The grandest canopy in the jungle — a round gathering place where the elders once convened. Its leaf adorns a distant nation's flag. Find the great circle table.",
+      "The grandest canopy in the jungle — a round gathering place where the elders once convened. Its leaf adorns a nation's flag. Find the great table.",
     hint: "A large conference room with a round table in the center-north area.",
     challengeUrl: '/challenges/5b2f8a3c.html',
   },
