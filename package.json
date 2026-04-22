@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "jsqr": "^1.4.0",
     "lucide-react": "^1.8.0",
     "motion": "^12.38.0",
