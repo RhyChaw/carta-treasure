@@ -99,7 +99,7 @@ export default function Scanner() {
         <form onSubmit={handleManualSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
           <input
             className="input-field"
-            placeholder="Or type room code (e.g. CLOVER)"
+            placeholder="Type the room phrase..."
             value={manualCode}
             onChange={e => setManualCode(e.target.value)}
             autoCapitalize="characters"

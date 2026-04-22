@@ -24,40 +24,41 @@ app instead (e.g. "CLOVER", "MAPLE", "LIBRARY", etc.)
 
 
 ╔══════════════════════════════════════════════╗
-║   10 CHALLENGE PAGE LINKS  (obfuscated URLs) ║
+║   10 ROOM CATCHPHRASES  (print & post)       ║
 ╚══════════════════════════════════════════════╝
 
-Organizer debug reference — obfuscated paths only.
+Print each phrase and stick it somewhere in the room.
+Players type the phrase into the manual entry box in the app.
 
 Checkpoint 1 — CLOVER
-https://treasure-hunt-carta.vercel.app/challenges/e3a7f2b1.html
+→  CLOVER MICROWAVED THE WIFI
 
 Checkpoint 2 — ASH
-https://treasure-hunt-carta.vercel.app/challenges/d9c4e108.html
+→  SEVENTEEN ANTS LOVE ASH
 
 Checkpoint 3 — MAPLE
-https://treasure-hunt-carta.vercel.app/challenges/5b2f8a3c.html
+→  WHY IS MAPLE CRYING
 
 Checkpoint 4 — ORCHID
-https://treasure-hunt-carta.vercel.app/challenges/7e1d4c9f.html
+→  ORCHID FORGOT PANTS AGAIN
 
 Checkpoint 5 — HICKORY
-https://treasure-hunt-carta.vercel.app/challenges/a4b6e20d.html
+→  PLEASE RETURN HICKORY NOW
 
 Checkpoint 6 — GLASGOW
-https://treasure-hunt-carta.vercel.app/challenges/2c9f1b7e.html
+→  NOBODY ASKED YOU GLASGOW
 
 Checkpoint 7 — IRIS
-https://treasure-hunt-carta.vercel.app/challenges/f8d3a5c2.html
+→  BALD EAGLE FEARS IRIS
 
 Checkpoint 8 — VIOLET
-https://treasure-hunt-carta.vercel.app/challenges/1a7e4b9d.html
+→  VIOLET OWNS A SUBMARINE
 
 Checkpoint 9 — CHERRY
-https://treasure-hunt-carta.vercel.app/challenges/6f2c8d3a.html
+→  CHERRY LOST HER DINOSAUR
 
 Checkpoint 10 — LIBRARY
-https://treasure-hunt-carta.vercel.app/challenges/b4e1f7c9.html
+→  LIBRARY LEFT THE OVEN
 
 
 ╔══════════════════════════════════════════════╗

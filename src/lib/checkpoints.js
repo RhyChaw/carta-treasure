@@ -103,7 +103,22 @@ export function validatePassphrase(checkpoint, input) {
   return checkpoint.passphrase.toUpperCase() === normalized
 }
 
+const CATCHPHRASES = {
+  'CLOVER MICROWAVED THE WIFI': 'CLOVER',
+  'SEVENTEEN ANTS LOVE ASH': 'ASH',
+  'WHY IS MAPLE CRYING': 'MAPLE',
+  'ORCHID FORGOT PANTS AGAIN': 'ORCHID',
+  'PLEASE RETURN HICKORY NOW': 'HICKORY',
+  'NOBODY ASKED YOU GLASGOW': 'GLASGOW',
+  'BALD EAGLE FEARS IRIS': 'IRIS',
+  'VIOLET OWNS A SUBMARINE': 'VIOLET',
+  'CHERRY LOST HER DINOSAUR': 'CHERRY',
+  'LIBRARY LEFT THE OVEN': 'LIBRARY',
+}
+
 export function parseQrCode(raw) {
-  if (!raw?.startsWith('JUNGLE_HUNT_')) return null
-  return raw.replace('JUNGLE_HUNT_', '')
+  if (!raw) return null
+  const normalized = raw.trim().toUpperCase()
+  if (normalized.startsWith('JUNGLE_HUNT_')) return normalized.replace('JUNGLE_HUNT_', '')
+  return CATCHPHRASES[normalized] ?? null
 }
