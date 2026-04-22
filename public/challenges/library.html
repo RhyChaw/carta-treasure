@@ -190,9 +190,17 @@
       <span>📷</span><span>Scan the Final QR</span>
     </button>
     <div id="reader"></div>
-    <p id="scan-err" style="display:none;margin-top:.5rem;font-size:.78rem;color:#555;text-align:center">
-      Camera unavailable — use your phone's native camera app to scan instead.
-    </p>
+    <div style="margin-top:1.1rem;border-top:1px solid #2a2a2a;padding-top:.9rem">
+      <p style="font-size:.72rem;color:#444;text-align:center;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.55rem">can't scan? type the keyword instead</p>
+      <input id="manual-code" type="text" placeholder="keyword..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+        style="background:#111;border:1px solid #2e2e2e;border-radius:7px;color:#9ca3af;font-family:'Courier New',monospace;font-size:.95rem;padding:.65rem .9rem;width:100%;outline:none;"
+        onkeydown="if(event.key==='Enter')checkManual()" />
+      <button onclick="checkManual()"
+        style="margin-top:.5rem;background:#181818;color:#6b9fff;font-family:'Courier New',monospace;font-size:.88rem;font-weight:bold;padding:.6rem 1rem;border:1px solid #333;border-radius:7px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.05em;">
+        → Continue
+      </button>
+      <p id="manual-err" style="display:none;margin-top:.4rem;font-size:.75rem;color:#555;text-align:center">That's not it. Look harder.</p>
+    </div>
   </div>
 
 </div>
@@ -346,6 +354,18 @@
       i++
       if (i >= full.length) clearInterval(iv)
     }, 28)
+  }
+
+  // ── Manual keyword fallback ──
+  function checkManual() {
+    const val = document.getElementById('manual-code').value.trim().toUpperCase()
+    if (val === 'ESPRESSO') {
+      window.location.href = '/challenges/espresso.html'
+    } else {
+      document.getElementById('manual-err').style.display = 'block'
+      document.getElementById('manual-code').value = ''
+      document.getElementById('manual-code').focus()
+    }
   }
 
   // ── QR Scanner ──
