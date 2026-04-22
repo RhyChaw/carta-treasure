@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { Lightbulb, Link } from 'lucide-react'
 
-export default function RiddleCard({ checkpoint, onScan }) {
+export default function RiddleCard({ checkpoint }) {
   const [showHint, setShowHint] = useState(false)
 
   if (!checkpoint) return null

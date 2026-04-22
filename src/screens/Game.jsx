@@ -12,47 +12,32 @@ export default function Game() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { player, updateStep, completeGame } = usePlayer()
-  const [passphrase, setPassphrase] = useState(() => searchParams.get('passphrase') ?? '')
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' })
   const [loading, setLoading] = useState(false)
   const [roomInput, setRoomInput] = useState('')
   const [roomError, setRoomError] = useState('')
+
   useEffect(() => {
     if (!player) navigate('/')
   }, [player, navigate])
 
+  // Auto-submit passphrase when returning from a challenge page
   useEffect(() => {
-    const pending = sessionStorage.getItem('jungle_scan_result')
-    if (pending) {
-      sessionStorage.removeItem('jungle_scan_result')
-      const current = getCheckpoint(player?.current_step)
-      if (current && pending === current.roomId) {
-        showToast(`You found ${pending}! Solve the challenge and enter the passphrase.`, 'success')
-      } else {
-        showToast("The spirits here don't welcome us yet... we must look elsewhere, explorer.", 'error')
-      }
+    const p = searchParams.get('passphrase')
+    if (p && player) {
+      navigate('/game', { replace: true })
+      submitPassphrase(p)
     }
-  }, [])
+  }, [player])
 
   function showToast(message, type = 'success') {
     setToast({ visible: true, message, type })
     setTimeout(() => setToast(t => ({ ...t, visible: false })), 3500)
   }
 
-  function handleRoomFallback(e) {
-    e.preventDefault()
-    const roomId = parseQrCode(roomInput)
-    if (roomId === currentCheckpoint?.roomId) {
-      window.location.href = currentCheckpoint.challengeUrl
-    } else {
-      setRoomError("That's not the right phrase — are you in the right room?")
-    }
-  }
-
-  async function handlePassphraseSubmit(e) {
-    e.preventDefault()
+  async function submitPassphrase(value) {
     const current = getCheckpoint(player.current_step)
-    if (!current || !validatePassphrase(current, passphrase)) {
+    if (!current || !validatePassphrase(current, value)) {
       showToast("The fairy shakes her head... that's not quite right. Try again, explorer.", 'error')
       return
     }
@@ -77,21 +62,29 @@ export default function Game() {
           is_first_place: isFirst,
           current_step: nextStep,
         }).eq('id', player.id)
-        const completedAt = new Date().toISOString()
-        completeGame(completedAt, isFirst)
+        completeGame(new Date().toISOString(), isFirst)
         navigate('/victory', { state: { fresh: true, isFirst } })
         return
       }
 
       await supabase.from('players').update({ current_step: nextStep }).eq('id', player.id)
       updateStep(nextStep)
-      setPassphrase('')
       showToast("Brilliant! The path forward reveals itself!", 'success')
     } catch (err) {
       showToast('Something went wrong. Try again.', 'error')
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  function handleRoomSubmit(e) {
+    e.preventDefault()
+    const roomId = parseQrCode(roomInput)
+    if (roomId === currentCheckpoint?.roomId) {
+      window.location.href = currentCheckpoint.challengeUrl
+    } else {
+      setRoomError("That's not the right phrase — are you in the right room?")
     }
   }
 
@@ -105,35 +98,14 @@ export default function Game() {
 
       <ProgressBar current={player.current_step} total={CHECKPOINTS.length} />
 
-      <RiddleCard
-        checkpoint={currentCheckpoint}
-        onScan={() => navigate('/scan')}
-      />
-
-      <div className="card">
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
-          "Got the answer? Enter the passphrase here, explorer..."
-        </p>
-        <form onSubmit={handlePassphraseSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <input
-            className="input-field"
-            placeholder="Enter passphrase..."
-            value={passphrase}
-            onChange={e => setPassphrase(e.target.value)}
-            autoCapitalize="none"
-          />
-          <button type="submit" className="btn-primary" disabled={loading || !passphrase.trim()}>
-            {loading ? 'Checking...' : 'Submit'}
-          </button>
-        </form>
-      </div>
+      <RiddleCard checkpoint={currentCheckpoint} />
 
       {currentCheckpoint && (
         <div className="card">
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '0.5rem' }}>
             "Found the phrase in the room? Enter it here..."
           </p>
-          <form onSubmit={handleRoomFallback} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <form onSubmit={handleRoomSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <input
               className="input-field"
               placeholder="Type the room phrase..."
@@ -142,8 +114,8 @@ export default function Game() {
               autoCapitalize="characters"
             />
             {roomError && <p style={{ fontSize: '0.8rem', color: 'var(--error)' }}>{roomError}</p>}
-            <button type="submit" className="btn-secondary" disabled={!roomInput.trim()}>
-              Open Challenge →
+            <button type="submit" className="btn-secondary" disabled={loading || !roomInput.trim()}>
+              {loading ? 'Checking...' : 'Open Challenge →'}
             </button>
           </form>
         </div>
@@ -152,14 +124,11 @@ export default function Game() {
       {completedCheckpoints.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {completedCheckpoints.map(c => (
-            <span key={c.roomId} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem',
-              background: '#0d3522',
-              border: '1px solid var(--green-glow)',
-              color: 'var(--green-glow)',
-              borderRadius: 20,
-              padding: '0.2rem 0.6rem',
-              fontSize: '0.75rem',
-              letterSpacing: '0.04em',
+            <span key={c.roomId} style={{
+              display: 'flex', alignItems: 'center', gap: '0.25rem',
+              background: '#0d3522', border: '1px solid var(--green-glow)',
+              color: 'var(--green-glow)', borderRadius: 20,
+              padding: '0.2rem 0.6rem', fontSize: '0.75rem', letterSpacing: '0.04em',
             }}>
               <Check size={10} strokeWidth={2.5} />{c.roomId}
             </span>
