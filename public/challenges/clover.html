@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkpoint 1 — Office Jungle Hunt</title>
   <style>
-    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35;--error:#ef4444}
+    :root{--bg:#1e5432;--card:#226040;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#2d7a50;--error:#ef4444}
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1.25rem}
     .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px;display:flex;flex-direction:column;gap:.75rem}
@@ -14,7 +14,7 @@
     p{line-height:1.6;font-size:.95rem}
     .fairy{width:80px}
     .muted{color:var(--muted);font-size:.875rem;font-style:italic}
-    input{background:#071e12;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none}
+    input{background:#0f3020;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none}
     input:focus{border-color:var(--green)}
     button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase}
     .error{color:var(--error);font-size:.875rem}
@@ -49,6 +49,22 @@
     <div id="tries-list"></div>
   </div>
   <script>
+  ;(function(){
+    var EX=0;
+    try{
+      var d=sessionStorage.getItem('jungle_player');
+      var p=d?JSON.parse(d):null;
+      if(!p)return;
+      if(p.current_step<EX){
+        var b=document.body;
+        b.style.cssText='background:#0A2A1B;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;font-family:Courier New,monospace;text-align:center;gap:1rem';
+        b.innerHTML='<img src="/assets/host_front.png" style="width:64px;opacity:.5">'
+          +'<p style="color:#4ADE80;font-size:1.1rem;font-weight:bold;margin:.5rem 0">Not yet, explorer.</p>'
+          +'<p style="color:#86a87a;font-size:.9rem;max-width:320px;line-height:1.6">You haven\'t reached this checkpoint yet. Follow the riddles in order.</p>'
+          +'<a href="/" style="color:#FBBF24;font-size:.85rem;text-decoration:none;margin-top:.5rem">&#8592; Back to the hunt</a>';
+      }
+    }catch(e){}
+  })();
     const H='8b71ba8d7381e37b4ba7fc22c7dcbc98b61a3eb025fb191fc0a58dbde65cef80'
     const tries=[]
     async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.toUpperCase()));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}

@@ -77,10 +77,10 @@
     /* ── Bottom input modal ── */
     #modal {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: #071e12; border-top: 2px solid var(--bracket-border);
-      padding: 1.25rem 1.25rem 2rem;
+      background: #091e14; border-top: 2px solid var(--bracket-border);
+      padding: 1.25rem 1.25rem 1.5rem;
       transform: translateY(110%);
-      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      transition: transform .3s cubic-bezier(.4,0,.2,1), bottom .15s ease;
       z-index: 200; max-width: 480px; margin: 0 auto;
     }
     #modal.open { transform: translateY(0); }
@@ -90,7 +90,7 @@
     }
     #modal-clue strong { color: #fff; font-style: normal; }
     #modal-input {
-      background: #0a2a1b; border: 1.5px solid var(--bracket-border);
+      background: #091e14; border: 1.5px solid var(--bracket-border);
       border-radius: 8px; color: var(--text); font-family: 'Courier New', monospace;
       font-size: 1.1rem; padding: .75rem 1rem; width: 100%; outline: none;
       text-transform: uppercase; letter-spacing: .08em; margin-bottom: .6rem;
@@ -168,7 +168,7 @@
       <h1>Checkpoint 3 — Bracket City</h1>
       <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a1f00;color:#FBBF24;border:1px solid #FBBF2466">MEDIUM</span>
     </div>
-    <p class="muted">"The fairy found an ancient scroll with nested secrets. Solve from the inside out!"</p>
+    <p class="muted">"The fairy found an ancient scroll with nested secrets. Solve from the inside out! (You may use google for this)"</p>
   </div>
 
   <div class="card">
@@ -209,6 +209,22 @@
   </div>
 
   <script>
+  ;(function(){
+    var EX=2;
+    try{
+      var d=sessionStorage.getItem('jungle_player');
+      var p=d?JSON.parse(d):null;
+      if(!p)return;
+      if(p.current_step<EX){
+        var b=document.body;
+        b.style.cssText='background:#0A2A1B;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;font-family:Courier New,monospace;text-align:center;gap:1rem';
+        b.innerHTML='<img src="/assets/host_front.png" style="width:64px;opacity:.5">'
+          +'<p style="color:#4ADE80;font-size:1.1rem;font-weight:bold;margin:.5rem 0">Not yet, explorer.</p>'
+          +'<p style="color:#86a87a;font-size:.9rem;max-width:320px;line-height:1.6">You haven\'t reached this checkpoint yet. Follow the riddles in order.</p>'
+          +'<a href="/" style="color:#FBBF24;font-size:.85rem;text-decoration:none;margin-top:.5rem">&#8592; Back to the hunt</a>';
+      }
+    }catch(e){}
+  })();
     const BRACKETS = {
       parliament: {
         id: 'parliament',
@@ -219,7 +235,7 @@
       },
       dissolves: {
         id: 'dissolves',
-        clue: 'Past tense of "dismiss" or "break up" — what a ruler does to an assembly',
+        clue: 'Present tense of "dismiss" or "break up" - what a ruler does to an assembly',
         answer: 'DISSOLVES',
         children: [],
         parentId: 'cromwell',
@@ -322,7 +338,9 @@
 
     function closeModal() {
       activeBracketId = null
-      document.getElementById('modal').classList.remove('open')
+      const modal = document.getElementById('modal')
+      modal.classList.remove('open')
+      modal.style.bottom = '0'
       render()
     }
 
@@ -403,6 +421,22 @@
       s.style.flexDirection = 'column'
       s.style.gap = '.75rem'
       s.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    // Lift modal above keyboard on mobile
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        const modal = document.getElementById('modal')
+        if (!modal.classList.contains('open')) return
+        const gap = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
+        modal.style.bottom = Math.max(0, gap) + 'px'
+      })
+      window.visualViewport.addEventListener('scroll', () => {
+        const modal = document.getElementById('modal')
+        if (!modal.classList.contains('open')) return
+        const gap = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
+        modal.style.bottom = Math.max(0, gap) + 'px'
+      })
     }
 
     // Close modal on outside tap
