@@ -181,19 +181,39 @@
 
   <div class="storm-card fade-up-3">
     <p style="color:#555;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.7rem;text-align:center">your final move</p>
-    <p style="color:#9ca3af;font-size:.85rem;line-height:1.9;">
+    <p style="color:#9ca3af;font-size:.85rem;line-height:1.9;margin-bottom:1rem;">
       Cross the office. Find the permanent employee.<br/>
       The one who never left their desk.<br/><br/>
       <strong style="color:#6b9fff">Read what's on their hat.</strong><br/>
-      Type it into the app to finish the hunt.
+      Type it below to finish the hunt.
     </p>
+    <input id="final-answer" type="text" placeholder="what does the hat say..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+      style="background:#111;border:1px solid #2e2e2e;border-radius:7px;color:#e8f5e2;font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none;margin-bottom:.6rem;"
+      onkeydown="if(event.key==='Enter')submitFinal()" />
+    <p id="final-err" style="display:none;font-size:.78rem;color:#555;margin-bottom:.5rem;">That's not it. Look closer.</p>
+    <button onclick="submitFinal()"
+      style="background:#1a3a1a;color:#4ADE80;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:1px solid #2d6a30;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.05em;">
+      → Finish the Hunt
+    </button>
   </div>
 
 </div>
 
 <script>
   const H = '563b1cfc8b15d2456747e24122524321f10093113c4bb35a5bea048ea0f54a6b'
+  const FINAL = 'I LOVE CARTA'
   let tries = 0
+
+  function submitFinal() {
+    const val = document.getElementById('final-answer').value.trim().replace(/\s+/g, ' ').toUpperCase()
+    if (val === FINAL) {
+      window.location.href = '/game?passphrase=' + encodeURIComponent(FINAL)
+    } else {
+      document.getElementById('final-err').style.display = 'block'
+      document.getElementById('final-answer').value = ''
+      document.getElementById('final-answer').focus()
+    }
+  }
 
   // ── Passphrase ──
   async function sha256(s) {
