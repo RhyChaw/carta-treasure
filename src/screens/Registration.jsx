@@ -32,6 +32,7 @@ export default function Registration() {
   const [adminDone, setAdminDone]   = useState(false)
   const [resetDone, setResetDone]   = useState(false)
   const [seedDone, setSeedDone]     = useState(false)
+  const [seedCount, setSeedCount]   = useState(10)
 
   useEffect(() => {
     if (!player) return
@@ -141,8 +142,11 @@ export default function Registration() {
     }
     setLoading(true)
     setAdminError('')
-    const names = ['Priya Sharma', 'Jake Okonkwo', 'Mei Lin', 'Carlos Vega', 'Aisha Patel',
-                   'Finn Larsen', 'Zoe Nakamura', 'Omar Hassan', 'Sofia Russo', 'Ben Achebe']
+    const allNames = ['Priya Sharma', 'Jake Okonkwo', 'Mei Lin', 'Carlos Vega', 'Aisha Patel',
+                      'Finn Larsen', 'Zoe Nakamura', 'Omar Hassan', 'Sofia Russo', 'Ben Achebe',
+                      'Luna Park', 'Kwame Asante', 'Ines Moreau', 'Ravi Nair', 'Chloe Dubois',
+                      'Marco Bianchi', 'Yuki Tanaka', 'Amara Diallo', 'Leo Ferreira', 'Nora Johansson']
+    const names = allNames.slice(0, seedCount)
     const now = Date.now()
     const players = names.map((name, i) => {
       const startOffset = (i * 3 + 2) * 60 * 1000
@@ -296,15 +300,26 @@ export default function Registration() {
             </button>
           )}
 
-          {seedDone && <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>10 fake winners seeded!</p>}
+          {seedDone && <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>{seedCount} fake winners seeded!</p>}
           {!seedDone && (
-            <button
-              onClick={handleAdminSeed}
-              disabled={loading || !adminPin}
-              style={{ background: '#2a1a4a', color: '#c084fc', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: '1px solid #5a3a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
-            >
-              {loading ? 'Seeding...' : '🌿 Seed 10 Fake Winners'}
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#c084fc' }}>
+                <span>Fake winners</span>
+                <span style={{ fontWeight: 'bold' }}>{seedCount}</span>
+              </div>
+              <input
+                type="range" min={1} max={20} value={seedCount}
+                onChange={e => setSeedCount(Number(e.target.value))}
+                style={{ width: '100%', accentColor: '#c084fc' }}
+              />
+              <button
+                onClick={handleAdminSeed}
+                disabled={loading || !adminPin}
+                style={{ background: '#2a1a4a', color: '#c084fc', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: '1px solid #5a3a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+              >
+                {loading ? 'Seeding...' : `🌿 Seed ${seedCount} Fake Winners`}
+              </button>
+            </div>
           )}
 
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.6rem', marginTop: '0.2rem' }}>

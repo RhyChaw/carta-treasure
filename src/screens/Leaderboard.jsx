@@ -34,6 +34,7 @@ export default function Leaderboard() {
     const { data } = await supabase
       .from('players')
       .select('id, name, current_step, completed_at, is_first_place, created_at')
+      .order('is_first_place', { ascending: false })
       .order('current_step', { ascending: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: true })
@@ -74,7 +75,14 @@ export default function Leaderboard() {
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04 }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    ...(row.is_first_place ? {
+                      border: '1px solid var(--gold)',
+                      background: 'linear-gradient(135deg, #1a120030, #0d352200)',
+                      boxShadow: '0 0 12px rgba(251,191,36,0.15)',
+                    } : {})
+                  }}
                 >
                   <span style={{
                     fontSize: i < 3 ? '1.3rem' : '0.9rem',
