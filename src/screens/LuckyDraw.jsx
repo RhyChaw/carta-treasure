@@ -75,6 +75,7 @@ export default function LuckyDraw() {
   const [pinError, setPinError] = useState('')
   const [unlocked, setUnlocked] = useState(false)
   const [drawCount, setDrawCount] = useState(3)
+  const [excluded, setExcluded] = useState(new Set())
   const [drawing, setDrawing] = useState(false)
   const [winners, setWinners] = useState([])
   const [landedCount, setLandedCount] = useState(0)
@@ -113,10 +114,10 @@ export default function LuckyDraw() {
   }
 
   function handleDraw() {
-    if (drawn || drawing || eligible.length === 0) return
+    if (drawn || drawing || included.length === 0) return
     drawTimeoutsRef.current.forEach(clearTimeout)
     drawTimeoutsRef.current = []
-    const picked = pickWinners(eligible, drawCount)
+    const picked = pickWinners(included, drawCount)
     setWinners(picked)
     setDrawing(true)
     setLandedCount(0)
@@ -133,7 +134,17 @@ export default function LuckyDraw() {
     })
   }
 
-  const eligibleNames = useMemo(() => eligible.map(p => p.name).filter(Boolean), [eligible])
+  const included = useMemo(() => eligible.filter(p => !excluded.has(p.id)), [eligible, excluded])
+  const eligibleNames = useMemo(() => included.map(p => p.name).filter(Boolean), [included])
+
+  function toggleExclude(id) {
+    if (drawn || drawing) return
+    setExcluded(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
   const isSpinning = drawing || landedCount > 0
 
   return (
@@ -145,7 +156,7 @@ export default function LuckyDraw() {
         <p className="text-muted" style={{ fontSize: '0.8rem' }}>
           {loading
             ? 'Loading...'
-            : `${eligible.length} eligible explorer${eligible.length !== 1 ? 's' : ''}`}
+            : `${included.length} in draw · ${eligible.length} total eligible`}
         </p>
         {fetchError && <p className="text-error" style={{ fontSize: '0.875rem' }}>{fetchError}</p>}
       </div>
@@ -185,14 +196,14 @@ export default function LuckyDraw() {
           {!drawn && (
             <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                <span>Number of winners</span>
-                <span style={{ fontWeight: 'bold', color: 'var(--green-glow)' }}>{Math.min(drawCount, eligible.length)}</span>
+                <span>Winners to draw</span>
+                <span style={{ fontWeight: 'bold', color: 'var(--green-glow)' }}>{Math.min(drawCount, included.length)} of {included.length} included</span>
               </div>
               <input
                 type="range"
                 min={1}
-                max={Math.max(1, eligible.length)}
-                value={drawCount}
+                max={Math.max(1, included.length)}
+                value={Math.min(drawCount, included.length)}
                 onChange={e => setDrawCount(Number(e.target.value))}
                 disabled={drawing}
                 style={{ width: '100%', accentColor: 'var(--green-glow)' }}
@@ -202,12 +213,12 @@ export default function LuckyDraw() {
           <button
             className="btn-primary"
             onClick={handleDraw}
-            disabled={drawing || drawn || eligible.length === 0}
+            disabled={drawing || drawn || included.length === 0}
           >
             {drawn
               ? <><PartyPopper size={15} strokeWidth={2} style={{ marginRight: 6 }} />Draw Complete</>
               : drawing ? 'Drawing...'
-              : `Draw ${Math.min(drawCount, eligible.length)} Winners`}
+              : `Draw ${Math.min(drawCount, included.length)} Winners`}
           </button>
         </div>
       )}
@@ -215,25 +226,32 @@ export default function LuckyDraw() {
       {/* Eligible list */}
       {eligible.length > 0 && (
         <div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-            Eligible Explorers
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Eligible Explorers
+            </p>
+            {!drawn && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>tap to exclude</p>}
+          </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
             {eligible.map(p => {
               const isWinner = drawn && winners.some(w => w.id === p.id)
+              const isExcluded = excluded.has(p.id)
               return (
                 <span
                   key={p.id}
+                  onClick={() => toggleExclude(p.id)}
                   style={{
                     background: isWinner ? 'var(--green-light)' : 'var(--bg-card)',
-                    border: `1px solid ${isWinner ? 'var(--green-glow)' : 'var(--border)'}`,
-                    color: isWinner ? 'var(--green-glow)' : 'var(--text-muted)',
+                    border: `1px solid ${isWinner ? 'var(--green-glow)' : isExcluded ? 'var(--error)' : 'var(--border)'}`,
+                    color: isWinner ? 'var(--green-glow)' : isExcluded ? 'var(--error)' : 'var(--text-muted)',
                     borderRadius: 20,
                     padding: '0.25rem 0.65rem',
                     fontSize: '0.78rem',
                     fontWeight: isWinner ? 'bold' : 'normal',
-                    opacity: drawn && !isWinner ? 0.45 : 1,
-                    transition: 'all 0.3s',
+                    opacity: (drawn && !isWinner) || isExcluded ? 0.45 : 1,
+                    textDecoration: isExcluded ? 'line-through' : 'none',
+                    cursor: drawn || drawing ? 'default' : 'pointer',
+                    transition: 'all 0.2s',
                   }}
                 >
                   {isWinner && <Check size={11} strokeWidth={2.5} style={{ marginRight: 3 }} />}{p.name}
