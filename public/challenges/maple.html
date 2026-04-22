@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkpoint 3 — Office Jungle Hunt</title>
+  <style>
+    :root {
+      --bg: #0A2A1B; --card: #0d3522; --green: #4ADE80; --gold: #FBBF24;
+      --text: #e8f5e2; --muted: #86a87a; --border: #1e5c35; --error: #ef4444;
+      --bracket-bg: #0a3d54; --bracket-border: #22d3ee; --bracket-text: #a5f3fc;
+      --locked-bg: #0f1e15; --locked-border: #1e3a28; --locked-text: #3a5a45;
+      --solved-color: #4ADE80;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Courier New', monospace;
+      min-height: 100dvh; display: flex; flex-direction: column;
+      align-items: center; padding: 1.5rem 1.25rem 8rem; gap: 1.25rem;
+    }
+    .fairy { width: 80px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; width: 100%; max-width: 440px;
+      display: flex; flex-direction: column; gap: .75rem;
+    }
+    h1 { color: var(--green); font-size: 1.15rem; letter-spacing: .06em; text-transform: uppercase; }
+    p { line-height: 1.6; font-size: .9rem; }
+    .muted { color: var(--muted); font-size: .85rem; font-style: italic; }
+
+    /* ── Sentence ── */
+    #sentence {
+      font-size: .95rem; line-height: 2.4;
+      word-break: break-word; letter-spacing: .01em;
+    }
+    .bracket {
+      display: inline; border-radius: 5px;
+      padding: .2rem .45rem; margin: .1rem .05rem;
+      cursor: pointer; user-select: none;
+      transition: background .15s, border-color .15s;
+      border: 1.5px solid transparent;
+    }
+    .bracket.active {
+      background: var(--bracket-bg); border-color: var(--bracket-border);
+      color: var(--bracket-text); cursor: pointer;
+    }
+    .bracket.active:active { background: #0e5070; }
+    .bracket.active.selected {
+      background: #0e5a7a; border-color: #67e8f9;
+      box-shadow: 0 0 0 2px rgba(34,211,238,.25);
+    }
+    .bracket.locked {
+      background: var(--locked-bg); border-color: var(--locked-border);
+      color: var(--locked-text); cursor: default;
+    }
+    .inline-solved {
+      color: var(--solved-color); font-weight: bold;
+      text-shadow: 0 0 6px rgba(74,222,128,.4);
+    }
+    .plain-word { color: var(--text); font-weight: bold; }
+    .final-word {
+      color: var(--solved-color); font-weight: bold; font-size: 1.1rem;
+      text-shadow: 0 0 10px rgba(74,222,128,.6);
+    }
+
+    /* ── Progress bar ── */
+    #progress-text { font-size: .75rem; color: var(--muted); text-align: right; }
+    .progress-bar {
+      height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--green); border-radius: 2px;
+      transition: width .4s ease;
+    }
+
+    /* ── Bottom input modal ── */
+    #modal {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #071e12; border-top: 2px solid var(--bracket-border);
+      padding: 1.25rem 1.25rem 2rem;
+      transform: translateY(110%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      z-index: 200; max-width: 480px; margin: 0 auto;
+    }
+    #modal.open { transform: translateY(0); }
+    #modal-clue {
+      font-size: .85rem; color: var(--bracket-text); margin-bottom: .75rem;
+      font-style: italic; line-height: 1.5;
+    }
+    #modal-clue strong { color: #fff; font-style: normal; }
+    #modal-input {
+      background: #0a2a1b; border: 1.5px solid var(--bracket-border);
+      border-radius: 8px; color: var(--text); font-family: 'Courier New', monospace;
+      font-size: 1.1rem; padding: .75rem 1rem; width: 100%; outline: none;
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: .6rem;
+    }
+    #modal-input:focus { border-color: #67e8f9; }
+    #modal-input.shake { animation: shake .4s ease; border-color: var(--error); }
+    #modal-submit {
+      background: var(--bracket-border); color: #0A2A1B;
+      font-family: 'Courier New', monospace; font-weight: bold;
+      font-size: .95rem; padding: .75rem; border: none; border-radius: 8px;
+      cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: .5rem;
+    }
+    #modal-error { font-size: .8rem; color: var(--error); min-height: 1.2em; text-align: center; }
+    #modal-hint-btn {
+      background: none; border: none; color: var(--muted); font-family: 'Courier New', monospace;
+      font-size: .75rem; cursor: pointer; text-decoration: underline; padding: .25rem;
+      display: none; width: 100%; text-align: center;
+    }
+    #modal-close {
+      position: absolute; top: .75rem; right: 1rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.2rem; cursor: pointer; padding: .25rem;
+    }
+    #modal-wrong-count { font-size: .72rem; color: var(--muted); text-align: center; margin-bottom: .25rem; }
+
+    /* ── Success ── */
+    #success-card { display: none; }
+    .passphrase {
+      font-size: 1rem; color: var(--gold); font-weight: bold;
+      background: #1a0d00; border: 1.5px solid var(--gold);
+      border-radius: 8px; padding: 1rem; text-align: center;
+      letter-spacing: .06em; line-height: 1.6;
+    }
+    .back-btn {
+      display: block; background: var(--green); color: #0A2A1B;
+      font-family: 'Courier New', monospace; font-size: .95rem; font-weight: bold;
+      padding: .8rem 1.5rem; border-radius: 8px; width: 100%;
+      text-transform: uppercase; text-align: center; text-decoration: none;
+    }
+
+    /* ── How-to-play ── */
+    .how-to { display: flex; flex-direction: column; gap: .5rem; }
+    .step { display: flex; gap: .6rem; align-items: flex-start; font-size: .82rem; line-height: 1.5; }
+    .step-num {
+      flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--bracket-border); color: #071e12; font-weight: bold;
+      font-size: .7rem; display: flex; align-items: center; justify-content: center;
+    }
+    .demo-bracket {
+      display: inline; background: var(--bracket-bg); border: 1.5px solid var(--bracket-border);
+      color: var(--bracket-text); border-radius: 4px; padding: .1rem .35rem;
+      font-size: .78rem;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .pop { animation: pop .25s ease; }
+  </style>
+</head>
+<body>
+  <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+      <h1>Checkpoint 3 — Bracket City</h1>
+      <span style="flex-shrink:0;font-size:.7rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .55rem;border-radius:4px;background:#2a1f00;color:#FBBF24;border:1px solid #FBBF2466">MEDIUM</span>
+    </div>
+    <p class="muted">"The fairy found an ancient scroll with nested secrets. Solve from the inside out!"</p>
+  </div>
+
+  <div class="card">
+    <div class="how-to">
+      <div class="step"><div class="step-num">1</div><span>Tap a <span class="demo-bracket">teal bracket</span> — these are solvable right now</span></div>
+      <div class="step"><div class="step-num">2</div><span>Type the word or phrase that matches the clue and submit</span></div>
+      <div class="step"><div class="step-num">3</div><span>Solve inner brackets first to unlock the outer ones</span></div>
+      <div class="step"><div class="step-num">4</div><span>Fill all four brackets to reveal the passphrase</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="puzzle-card">
+    <div id="sentence"></div>
+    <div style="margin-top:.75rem">
+      <p id="progress-text">0 / 4 solved</p>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="card" id="success-card">
+    <p style="color:var(--green);font-weight:bold;text-align:center;font-size:1.05rem">✓ The scroll is fully decoded!</p>
+    <p style="font-size:.85rem;color:var(--muted);text-align:center">Your passphrase is:</p>
+    <div class="passphrase">CROMWELL DISSOLVES THE RUMP PARLIAMENT</div>
+    <p style="font-size:.78rem;color:var(--muted);text-align:center">Type this exactly into the treasure hunt app to unlock the next checkpoint.</p>
+    <a class="back-btn" href="/game?passphrase=CROMWELL%20DISSOLVES%20THE%20RUMP%20PARLIAMENT">Back to App →</a>
+  </div>
+
+  <!-- Bottom input modal -->
+  <div id="modal">
+    <button id="modal-close" onclick="closeModal()">✕</button>
+    <p id="modal-clue"></p>
+    <input id="modal-input" type="text" placeholder="Your answer..." autocomplete="off" spellcheck="false"
+      onkeydown="if(event.key==='Enter')submitAnswer()" oninput="this.value=this.value.toUpperCase()" />
+    <p id="modal-wrong-count"></p>
+    <button id="modal-submit" onclick="submitAnswer()">Submit →</button>
+    <p id="modal-error"></p>
+    <button id="modal-hint-btn" onclick="useHint()">Show a hint</button>
+  </div>
+
+  <script>
+    const BRACKETS = {
+      parliament: {
+        id: 'parliament',
+        clue: 'Government body where elected officials debate and pass laws',
+        answer: 'PARLIAMENT',
+        children: [],
+        parentId: 'rump',
+      },
+      dissolves: {
+        id: 'dissolves',
+        clue: 'Past tense of "dismiss" or "break up" — what a ruler does to an assembly',
+        answer: 'DISSOLVES',
+        children: [],
+        parentId: 'cromwell',
+      },
+      rump: {
+        id: 'rump',
+        get clue() {
+          return solved.has('parliament')
+            ? 'Nickname for the remnant PARLIAMENT (the part left after most members were expelled)'
+            : 'Nickname for the remnant [government body] left after most members were expelled'
+        },
+        answer: 'RUMP PARLIAMENT',
+        children: ['parliament'],
+        parentId: 'cromwell',
+      },
+      cromwell: {
+        id: 'cromwell',
+        clue: 'English leader who DISSOLVES the RUMP PARLIAMENT in 1653 — his surname',
+        answer: 'CROMWELL',
+        children: ['dissolves', 'rump'],
+        parentId: null,
+      },
+    }
+
+    const solved = new Set()
+    const wrongCounts = { parliament: 0, dissolves: 0, rump: 0, cromwell: 0 }
+    const hintUsed = { parliament: 0, dissolves: 0, rump: 0, cromwell: 0 }
+    let activeBracketId = null
+
+    function isActive(id) {
+      return !solved.has(id) && BRACKETS[id].children.every(c => solved.has(c))
+    }
+
+    function bracketHtml(id, text) {
+      const active = isActive(id)
+      const sel = activeBracketId === id ? ' selected' : ''
+      if (!active) return `<span class="bracket locked">${text}</span>`
+      return `<span class="bracket active${sel}" id="b-${id}" onclick="clickBracket('${id}')">${text}</span>`
+    }
+
+    function renderSentence() {
+      if (solved.has('cromwell')) {
+        return '<span class="final-word">CROMWELL</span> <span class="final-word">DISSOLVES</span> <span class="plain-word">THE</span> <span class="final-word">RUMP PARLIAMENT</span>'
+      }
+
+      const parlSolved = solved.has('parliament')
+      const rumpSolved = solved.has('rump')
+      const dissolvesSolved = solved.has('dissolves')
+
+      const parlPart = parlSolved
+        ? '<span class="inline-solved">PARLIAMENT</span>'
+        : bracketHtml('parliament', 'government body where elected officials make laws')
+
+      let rumpPart
+      if (rumpSolved) {
+        rumpPart = '<span class="inline-solved">RUMP PARLIAMENT</span>'
+      } else if (parlSolved) {
+        rumpPart = bracketHtml('rump', 'nickname for the remnant PARLIAMENT')
+      } else {
+        rumpPart = `<span class="bracket locked">nickname for the remnant ${parlPart}</span>`
+      }
+
+      const dissolvesPart = dissolvesSolved
+        ? '<span class="inline-solved">DISSOLVES</span>'
+        : bracketHtml('dissolves', 'past tense of "dismiss" or "break up"')
+
+      const cromwellActive = dissolvesSolved && rumpSolved
+      if (cromwellActive) {
+        const sel = activeBracketId === 'cromwell' ? ' selected' : ''
+        return `<span class="bracket active${sel}" id="b-cromwell" onclick="clickBracket('cromwell')">English leader who DISSOLVES the RUMP PARLIAMENT in 1653</span>`
+      }
+
+      return `<span class="bracket locked">Leader who ${dissolvesPart} the ${rumpPart}</span>`
+    }
+
+    function render() {
+      document.getElementById('sentence').innerHTML = renderSentence()
+      const count = solved.size
+      document.getElementById('progress-text').textContent = `${count} / 4 solved`
+      document.getElementById('progress-fill').style.width = `${count * 25}%`
+    }
+
+    function clickBracket(id) {
+      if (!isActive(id)) return
+      activeBracketId = id
+      render()
+      openModal(id)
+    }
+
+    function openModal(id) {
+      const b = BRACKETS[id]
+      document.getElementById('modal-clue').innerHTML = `<strong>${b.clue}</strong>`
+      document.getElementById('modal-input').value = ''
+      document.getElementById('modal-error').textContent = ''
+      document.getElementById('modal-wrong-count').textContent = ''
+      updateHintBtn(id)
+      document.getElementById('modal').classList.add('open')
+      setTimeout(() => document.getElementById('modal-input').focus(), 350)
+    }
+
+    function closeModal() {
+      activeBracketId = null
+      document.getElementById('modal').classList.remove('open')
+      render()
+    }
+
+    function updateHintBtn(id) {
+      const w = wrongCounts[id] || 0
+      const h = hintUsed[id] || 0
+      const btn = document.getElementById('modal-hint-btn')
+      const answer = BRACKETS[id].answer
+      if (w >= 3 || h > 0) {
+        const letters = h + 1
+        btn.style.display = 'block'
+        btn.textContent = `Hint: starts with "${answer.slice(0, letters)}"`
+      } else if (w >= 1) {
+        btn.style.display = 'block'
+        btn.textContent = 'Show a hint'
+      } else {
+        btn.style.display = 'none'
+      }
+    }
+
+    function useHint() {
+      if (!activeBracketId) return
+      hintUsed[activeBracketId] = (hintUsed[activeBracketId] || 0) + 1
+      updateHintBtn(activeBracketId)
+    }
+
+    function submitAnswer() {
+      if (!activeBracketId) return
+      const id = activeBracketId
+      const b = BRACKETS[id]
+      const input = document.getElementById('modal-input')
+      const val = input.value.trim().toUpperCase().replace(/\s+/g, ' ')
+      if (!val) return
+
+      if (val === b.answer) {
+        // Correct!
+        solved.add(id)
+        wrongCounts[id] = 0
+        closeModal()
+        render()
+        // Pop animation on the solved word
+        setTimeout(() => {
+          const el = document.querySelector(`#b-${id}`) || document.querySelector('.inline-solved')
+          if (el) el.classList.add('pop')
+        }, 50)
+        // Check win
+        if (solved.size === 4) setTimeout(showVictory, 600)
+        // If parent becomes active, show subtle cue
+        const parentId = b.parentId
+        if (parentId && isActive(parentId)) {
+          setTimeout(() => {
+            const parentEl = document.getElementById(`b-${parentId}`)
+            if (parentEl) parentEl.classList.add('pop')
+          }, 300)
+        }
+      } else {
+        wrongCounts[id] = (wrongCounts[id] || 0) + 1
+        input.value = ''
+        const errEl = document.getElementById('modal-error')
+        errEl.textContent = wrongCounts[id] >= 3
+          ? `Not quite — check the hint!`
+          : `Not quite. Try again.`
+        document.getElementById('modal-wrong-count').textContent =
+          wrongCounts[id] >= 2 ? `${wrongCounts[id]} wrong attempts` : ''
+        input.classList.remove('shake')
+        void input.offsetWidth
+        input.classList.add('shake')
+        updateHintBtn(id)
+        setTimeout(() => { input.classList.remove('shake'); errEl.textContent = '' }, 1200)
+      }
+    }
+
+    function showVictory() {
+      document.getElementById('puzzle-card').style.opacity = '.5'
+      document.getElementById('puzzle-card').style.pointerEvents = 'none'
+      const s = document.getElementById('success-card')
+      s.style.display = 'flex'
+      s.style.flexDirection = 'column'
+      s.style.gap = '.75rem'
+      s.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    // Close modal on outside tap
+    document.addEventListener('click', e => {
+      const modal = document.getElementById('modal')
+      if (modal.classList.contains('open') && !modal.contains(e.target) && !e.target.closest('.bracket')) {
+        closeModal()
+      }
+    })
+
+    render()
+  </script>
+</body>
+</html>

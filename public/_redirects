@@ -1,1 +1,14 @@
-/*    /index.html   200
+# Challenge page rewrites — hash URLs resolve to room-named files (URL stays as hash in browser)
+/challenges/e3a7f2b1.html  /challenges/clover.html    200
+/challenges/d9c4e108.html  /challenges/ash.html       200
+/challenges/5b2f8a3c.html  /challenges/maple.html     200
+/challenges/7e1d4c9f.html  /challenges/orchid.html    200
+/challenges/a4b6e20d.html  /challenges/hickory.html   200
+/challenges/2c9f1b7e.html  /challenges/glasgow.html   200
+/challenges/f8d3a5c2.html  /challenges/iris.html      200
+/challenges/1a7e4b9d.html  /challenges/violet.html    200
+/challenges/6f2c8d3a.html  /challenges/cherry.html    200
+/challenges/b4e1f7c9.html  /challenges/library.html   200
+
+# SPA fallback
+/*  /index.html  200
