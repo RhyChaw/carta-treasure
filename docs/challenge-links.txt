@@ -30,34 +30,34 @@ app instead (e.g. "CLOVER", "MAPLE", "LIBRARY", etc.)
 Organizer debug reference — obfuscated paths only.
 
 Checkpoint 1 — CLOVER
-https://carta-treasure.vercel.app/challenges/e3a7f2b1.html
+https://treasure-hunt-carta.vercel.app/challenges/e3a7f2b1.html
 
 Checkpoint 2 — ASH
-https://carta-treasure.vercel.app/challenges/d9c4e108.html
+https://treasure-hunt-carta.vercel.app/challenges/d9c4e108.html
 
 Checkpoint 3 — MAPLE
-https://carta-treasure.vercel.app/challenges/5b2f8a3c.html
+https://treasure-hunt-carta.vercel.app/challenges/5b2f8a3c.html
 
 Checkpoint 4 — ORCHID
-https://carta-treasure.vercel.app/challenges/7e1d4c9f.html
+https://treasure-hunt-carta.vercel.app/challenges/7e1d4c9f.html
 
 Checkpoint 5 — HICKORY
-https://carta-treasure.vercel.app/challenges/a4b6e20d.html
+https://treasure-hunt-carta.vercel.app/challenges/a4b6e20d.html
 
 Checkpoint 6 — GLASGOW
-https://carta-treasure.vercel.app/challenges/2c9f1b7e.html
+https://treasure-hunt-carta.vercel.app/challenges/2c9f1b7e.html
 
 Checkpoint 7 — IRIS
-https://carta-treasure.vercel.app/challenges/f8d3a5c2.html
+https://treasure-hunt-carta.vercel.app/challenges/f8d3a5c2.html
 
 Checkpoint 8 — VIOLET
-https://carta-treasure.vercel.app/challenges/1a7e4b9d.html
+https://treasure-hunt-carta.vercel.app/challenges/1a7e4b9d.html
 
 Checkpoint 9 — CHERRY
-https://carta-treasure.vercel.app/challenges/6f2c8d3a.html
+https://treasure-hunt-carta.vercel.app/challenges/6f2c8d3a.html
 
 Checkpoint 10 — LIBRARY
-https://carta-treasure.vercel.app/challenges/b4e1f7c9.html
+https://treasure-hunt-carta.vercel.app/challenges/b4e1f7c9.html
 
 
 ╔══════════════════════════════════════════════╗
@@ -69,11 +69,11 @@ Place them at the physical locations.
 
 ESPRESSO MACHINE
 → Tape to side of machine or drip tray
-https://carta-treasure.vercel.app/challenges/espresso.html
+https://treasure-hunt-carta.vercel.app/challenges/espresso.html
 
 SKELETON DESK
 → Place on skeleton / desk / around neck as a badge
-https://carta-treasure.vercel.app/challenges/skeleton.html
+https://treasure-hunt-carta.vercel.app/challenges/skeleton.html
 
 
 ╔══════════════════════════════════════════════╗
