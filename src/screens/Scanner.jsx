@@ -47,16 +47,18 @@ export default function Scanner() {
     if (doneRef.current) return
     const video = videoRef.current
     const canvas = canvasRef.current
-    if (!video || video.readyState < 2 || !canvas) {
+    const w = video?.videoWidth
+    const h = video?.videoHeight
+    if (!video || !canvas || !w || !h) {
       rafRef.current = requestAnimationFrame(scanFrame)
       return
     }
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(video, 0, 0)
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    ctx.drawImage(video, 0, 0, w, h)
+    const imageData = ctx.getImageData(0, 0, w, h)
+    const code = jsQR(imageData.data, w, h, { inversionAttempts: 'dontInvert' })
     if (code?.data) {
       const roomId = parseQrCode(code.data)
       if (roomId) {
