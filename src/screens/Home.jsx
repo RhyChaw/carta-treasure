@@ -7,7 +7,13 @@ import ProgressBar from '../components/ProgressBar'
 
 export default function Home() {
   const navigate = useNavigate()
-  const { player } = usePlayer()
+  const { player, updateStep, completeGame } = usePlayer()
+
+  function debugWin() {
+    updateStep(10)
+    completeGame(new Date().toISOString(), true)
+    navigate('/victory', { state: { fresh: true, isFirst: true } })
+  }
 
   if (!player) return null
 
@@ -116,6 +122,13 @@ export default function Home() {
           </button>
         ))}
       </div>
+
+      <button
+        onClick={debugWin}
+        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.4, letterSpacing: '0.04em', marginTop: '0.5rem' }}
+      >
+        debug: simulate win
+      </button>
     </div>
   )
 }
