@@ -31,6 +31,7 @@ export default function Registration() {
   const [adminError, setAdminError] = useState('')
   const [adminDone, setAdminDone]   = useState(false)
   const [resetDone, setResetDone]   = useState(false)
+  const [seedDone, setSeedDone]     = useState(false)
 
   useEffect(() => {
     if (!player) return
@@ -129,6 +130,31 @@ export default function Registration() {
       setResetDone(true)
       setAdminPin('')
     }
+  }
+
+  async function handleAdminSeed(e) {
+    e.preventDefault()
+    if (adminPin !== import.meta.env.VITE_LUCKY_DRAW_PIN) {
+      setAdminError('Wrong PIN.')
+      setAdminPin('')
+      return
+    }
+    setLoading(true)
+    setAdminError('')
+    const names = ['Priya Sharma', 'Jake Okonkwo', 'Mei Lin', 'Carlos Vega', 'Aisha Patel',
+                   'Finn Larsen', 'Zoe Nakamura', 'Omar Hassan', 'Sofia Russo', 'Ben Achebe']
+    const now = Date.now()
+    const players = names.map((name, i) => {
+      const startOffset = (i * 3 + 2) * 60 * 1000
+      const duration = (18 + i * 3 + Math.floor(Math.random() * 5)) * 60 * 1000
+      const created_at = new Date(now - startOffset - duration).toISOString()
+      const completed_at = new Date(now - startOffset).toISOString()
+      return { name, current_step: 10, completed_at, created_at, is_first_place: false }
+    })
+    const { error } = await supabase.from('players').insert(players)
+    setLoading(false)
+    if (error) setAdminError(error.message)
+    else { setSeedDone(true); setAdminPin('') }
   }
 
   return (
@@ -270,6 +296,17 @@ export default function Registration() {
             </button>
           )}
 
+          {seedDone && <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>10 fake winners seeded!</p>}
+          {!seedDone && (
+            <button
+              onClick={handleAdminSeed}
+              disabled={loading || !adminPin}
+              style={{ background: '#2a1a4a', color: '#c084fc', fontFamily: "'Courier New', monospace", fontWeight: 'bold', fontSize: '0.875rem', padding: '0.7rem', borderRadius: 8, border: '1px solid #5a3a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+            >
+              {loading ? 'Seeding...' : '🌿 Seed 10 Fake Winners'}
+            </button>
+          )}
+
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.6rem', marginTop: '0.2rem' }}>
             {adminDone ? (
               <p style={{ fontSize: '0.875rem', color: 'var(--green-glow)' }}>All participants deleted.</p>
@@ -284,7 +321,7 @@ export default function Registration() {
             )}
           </div>
 
-          <button className="btn-ghost" onClick={() => { setShowAdmin(false); setAdminPin(''); setAdminError(''); setAdminDone(false); setResetDone(false) }} style={{ fontSize: '0.8rem' }}>
+          <button className="btn-ghost" onClick={() => { setShowAdmin(false); setAdminPin(''); setAdminError(''); setAdminDone(false); setResetDone(false); setSeedDone(false) }} style={{ fontSize: '0.8rem' }}>
             Cancel
           </button>
         </div>

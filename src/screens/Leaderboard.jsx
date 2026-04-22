@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Medal, Check } from 'lucide-react'
+import { Medal, Check, Clock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { CHECKPOINTS } from '../lib/checkpoints'
 
@@ -91,13 +91,15 @@ export default function Leaderboard() {
                     <p style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
                       {row.name}
                       {row.is_first_place && (
-                        <span style={{ marginLeft: '0.4rem', fontSize: '0.75rem', color: 'var(--gold)' }}>SPECIAL PRIZE</span>
+                        <span style={{ marginLeft: '0.4rem', fontSize: '0.75rem', color: 'var(--gold)' }}>👑 SPECIAL PRIZE</span>
                       )}
                     </p>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      {isFinished
-                        ? `Finished · ${duration ?? '—'}`
-                        : `Step ${row.current_step} / ${CHECKPOINTS.length}`}
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.15rem' }}>
+                      {isFinished ? (
+                        <><Clock size={11} strokeWidth={2} />{duration ?? '—'}</>
+                      ) : (
+                        `Step ${row.current_step} / ${CHECKPOINTS.length}`
+                      )}
                     </p>
                   </div>
                   <span style={{
