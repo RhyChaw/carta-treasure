@@ -62,7 +62,14 @@ function applyTransform(t, lat, lng) {
 
 const TRANSFORM = GPS_CALIBRATED ? buildTransform(GPS_REFS) : null
 
-export default function MapView({ completedRooms = [], currentRoom, highlightRoom = false }) {
+function formatMs(ms) {
+  const totalSec = Math.ceil(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+export default function MapView({ completedRooms = [], currentRoom, isStuck = false, remainingMs = 0 }) {
   const containerRef = useRef(null)
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
   const [userPos, setUserPos] = useState(null)
@@ -93,15 +100,18 @@ export default function MapView({ completedRooms = [], currentRoom, highlightRoo
   const userVisible = userMapPos && userMapPos.xPct >= 0 && userMapPos.xPct <= 100 && userMapPos.yPct >= 0 && userMapPos.yPct <= 100
   const outsideOffice = userPos && TRANSFORM && !userVisible
 
+  // Current room is only "revealed" after the 5-min timer fires
+  const currentRevealed = isStuck
+
   function getPinColor(roomId) {
     if (completedRooms.includes(roomId)) return '#4ADE80'
-    if (roomId === currentRoom) return '#FBBF24'
+    if (roomId === currentRoom && currentRevealed) return '#FBBF24'
     return '#374151'
   }
 
   function getPinLabel(roomId) {
     if (completedRooms.includes(roomId)) return '✓'
-    if (roomId === currentRoom) return '●'
+    if (roomId === currentRoom && currentRevealed) return '●'
     return '○'
   }
 
@@ -128,33 +138,33 @@ export default function MapView({ completedRooms = [], currentRoom, highlightRoo
         {imgSize.w > 0 && CHECKPOINT_ROOMS.map(roomId => {
           const pin = ROOM_PINS[roomId]
           if (!pin) return null
-          const isCurrent = roomId === currentRoom
+          const isActive = roomId === currentRoom && currentRevealed
           return (
             <div
               key={roomId}
-              title={roomId}
+              title={isActive ? roomId : undefined}
               style={{
                 position: 'absolute',
                 left: `${pin.x}%`,
                 top: `${pin.y}%`,
                 transform: 'translate(-50%, -50%)',
-                width: isCurrent && highlightRoom ? 28 : isCurrent ? 22 : 18,
-                height: isCurrent && highlightRoom ? 28 : isCurrent ? 22 : 18,
+                width: isActive ? 28 : 18,
+                height: isActive ? 28 : 18,
                 borderRadius: '50%',
                 background: getPinColor(roomId),
-                border: `${isCurrent && highlightRoom ? 3 : 2}px solid ${isCurrent ? '#fff' : 'rgba(0,0,0,0.4)'}`,
+                border: `${isActive ? 3 : 2}px solid ${isActive ? '#fff' : 'rgba(0,0,0,0.4)'}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: isCurrent && highlightRoom ? 10 : 8,
+                fontSize: isActive ? 10 : 8,
                 color: '#0A2A1B',
                 fontWeight: 'bold',
                 cursor: 'default',
-                animation: isCurrent ? 'pulse-glow 2s ease-in-out infinite' : 'none',
-                zIndex: isCurrent ? 2 : 1,
-                boxShadow: isCurrent && highlightRoom
+                animation: isActive ? 'pulse-glow 2s ease-in-out infinite' : 'none',
+                zIndex: isActive ? 2 : 1,
+                boxShadow: isActive
                   ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24'
-                  : isCurrent ? '0 0 8px #FBBF24' : 'none',
+                  : 'none',
               }}
             >
               {getPinLabel(roomId)}
@@ -200,10 +210,22 @@ export default function MapView({ completedRooms = [], currentRoom, highlightRoo
 
       <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
         <span style={{ color: '#4ADE80' }}>● Completed</span>
-        <span style={{ color: '#FBBF24' }}>● Current Target</span>
+        {currentRevealed && <span style={{ color: '#FBBF24' }}>● Current Target</span>}
         <span style={{ color: '#374151' }}>● Undiscovered</span>
         {GPS_CALIBRATED && <span style={{ color: '#3B82F6' }}>● You</span>}
       </div>
+
+      {currentRoom && !currentRevealed && remainingMs > 0 && (
+        <div style={{
+          padding: '0.5rem 0.75rem 0.6rem',
+          fontSize: '0.78rem',
+          fontWeight: 'bold',
+          color: '#FBBF24',
+          letterSpacing: '0.04em',
+        }}>
+          SEE CURRENT TARGET IN {formatMs(remainingMs)}
+        </div>
+      )}
       {outsideOffice && (
         <div style={{ padding: '0.4rem 0.75rem 0.6rem', fontSize: '0.78rem', color: '#FBBF24', fontWeight: 'bold' }}>
           You are outside the office

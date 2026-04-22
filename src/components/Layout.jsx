@@ -14,7 +14,7 @@ export default function Layout({ children }) {
   const [rank, setRank]                 = useState(null)
   const [winnerToast, setWinnerToast]   = useState(null)
   const { player } = usePlayer()
-  const isStuck = useStuckTimer(player)
+  const { isStuck, remainingMs } = useStuckTimer(player)
 
   // Fetch & keep rank current
   useEffect(() => {
@@ -138,7 +138,8 @@ export default function Layout({ children }) {
                 <MapView
                   completedRooms={completedRooms}
                   currentRoom={currentCheckpoint?.roomId}
-                  highlightRoom={isStuck}
+                  isStuck={isStuck}
+                  remainingMs={remainingMs}
                 />
               </div>
             </motion.div>

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 
-const THRESHOLD_MS = 5 * 60 * 1000 // 5 minutes
+const THRESHOLD_MS = 5 * 60 * 1000
 
 export function useStuckTimer(player) {
-  const [isStuck, setIsStuck] = useState(false)
+  const [state, setState] = useState({ isStuck: false, remainingMs: THRESHOLD_MS })
 
   useEffect(() => {
     const step = player?.current_step
     if (step == null || step >= 10 || player?.completed_at) {
-      setIsStuck(false)
+      setState({ isStuck: false, remainingMs: 0 })
       return
     }
 
@@ -21,18 +21,22 @@ export function useStuckTimer(player) {
       startTime = parseInt(startTime, 10)
     }
 
-    const elapsed = Date.now() - startTime
-    const remaining = THRESHOLD_MS - elapsed
-
-    if (remaining <= 0) {
-      setIsStuck(true)
-      return
+    function tick() {
+      const elapsed = Date.now() - startTime
+      const remaining = Math.max(0, THRESHOLD_MS - elapsed)
+      const stuck = remaining === 0
+      setState({ isStuck: stuck, remainingMs: remaining })
+      return stuck
     }
 
-    setIsStuck(false)
-    const t = setTimeout(() => setIsStuck(true), remaining)
-    return () => clearTimeout(t)
+    if (tick()) return
+
+    const interval = setInterval(() => {
+      if (tick()) clearInterval(interval)
+    }, 1000)
+
+    return () => clearInterval(interval)
   }, [player?.current_step, player?.id, player?.completed_at])
 
-  return isStuck
+  return state
 }

@@ -5,7 +5,7 @@ import MapView from '../components/MapView'
 
 export default function MapScreen() {
   const { player } = usePlayer()
-  const isStuck = useStuckTimer(player)
+  const { isStuck, remainingMs } = useStuckTimer(player)
 
   if (!player) return null
 
@@ -25,7 +25,8 @@ export default function MapScreen() {
       <MapView
         completedRooms={completedRooms}
         currentRoom={currentCheckpoint?.roomId}
-        highlightRoom={isStuck}
+        isStuck={isStuck}
+        remainingMs={remainingMs}
       />
     </div>
   )
