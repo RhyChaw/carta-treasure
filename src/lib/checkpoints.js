@@ -83,7 +83,7 @@ export const CHECKPOINTS = [
   {
     index: 9,
     roomId: 'LIBRARY',
-    passphrase: 'FREEATLAST',
+    passphrase: 'I LOVE CARTA',
     riddle:
       "Your journey nears its end, brave explorer. All jungle knowledge flows to one sacred place — the ancient archive where wisdom sleeps. In the southern gardens, four rooms stand in a row. You've visited the second — now seek the first. Go to where books live... and find the fairy's final trial.",
     hint: "The Library. South side, leftmost of the four rooms. You're almost there.",

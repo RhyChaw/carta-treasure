@@ -62,31 +62,29 @@ Checkpoint 10 — LIBRARY
 
 
 ╔══════════════════════════════════════════════╗
-║   2 FINALE CHAIN LINKS  (direct web URLs)    ║
+║   FINALE PRINTED CARDS  (no QR codes)        ║
 ╚══════════════════════════════════════════════╝
 
-Print and encode these as QR codes linking to the URLs.
-Place them at the physical locations.
-
 ESPRESSO MACHINE
-→ Tape to side of machine or drip tray
-https://treasure-hunt-carta.vercel.app/challenges/espresso.html
+→ Tape a card to the machine with this phrase printed on it:
 
-SKELETON DESK
-→ Place on skeleton / desk / around neck as a badge
-https://treasure-hunt-carta.vercel.app/challenges/skeleton.html
+   ESPRESSO NO DEPRESSO
+
+SKELETON
+→ Put this on the skeleton's hat / badge:
+
+   I LOVE CARTA
 
 
 ╔══════════════════════════════════════════════╗
 ║   FINALE FLOW SUMMARY                        ║
 ╚══════════════════════════════════════════════╝
 
-1. Player scans JUNGLE_HUNT_LIBRARY in the app
-2. App unlocks Library checkpoint, shows passphrase prompt
-3. Player opens the library challenge page (link in app)
+1. Player types room phrase in the app → unlocks Library checkpoint
+2. Player opens the library challenge page (link in app)
    → Sabrina Carpenter hint: "find where it's MADE"
-4. Player walks to espresso machine, scans QR there
-   → Opens espresso.html: points to skeleton across from Violet
-5. Player finds skeleton, scans QR on/near skeleton
-   → Opens skeleton.html: full victory animation + passphrase FREEATLAST
-6. Player types FREEATLAST back in the app to complete the hunt
+3. Player walks to espresso machine, reads the card
+   → Types ESPRESSO NO DEPRESSO in library challenge page
+4. False hope → thunderstorm scene → told to find the skeleton
+5. Player finds skeleton, reads their hat
+   → Types I LOVE CARTA in the app to complete the hunt
