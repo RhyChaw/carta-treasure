@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkpoint 10 — Office Jungle Hunt</title>
   <style>
-    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35}
+    :root{--bg:#0A2A1B;--card:#0d3522;--green:#4ADE80;--gold:#FBBF24;--text:#e8f5e2;--muted:#86a87a;--border:#1e5c35;--error:#ef4444}
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem 2.5rem;gap:1.25rem}
     .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;width:100%;max-width:440px}
-    h1{color:var(--green);font-size:1rem;letter-spacing:.06em;text-transform:uppercase}
     p{line-height:1.7;font-size:.9rem}
     .muted{color:var(--muted);font-style:italic}
     .gold{color:var(--gold);font-weight:bold}
-    .green{color:var(--green)}
     .sep{border:none;border-top:1px solid var(--border);margin:.6rem 0}
     .badge{font-size:.65rem;font-weight:bold;letter-spacing:.08em;padding:.2rem .5rem;border-radius:4px;background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
 
@@ -34,9 +32,26 @@
     .lyric em{color:var(--text);font-style:italic;font-size:.95rem;line-height:1.8}
     .lyric small{display:block;margin-top:.3rem;font-size:.75rem;color:var(--muted)}
 
-    .whisper{padding:.6rem .9rem;border-left:2px solid var(--green);margin:.6rem 0;font-style:italic;color:var(--green);font-size:.9rem;line-height:1.8}
+    .whisper{padding:.6rem .9rem;border-left:2px solid var(--green);margin:.6rem 0;font-style:italic;color:#4ADE80;font-size:.9rem;line-height:1.8}
 
-    .hint-box{background:#071e12;border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:.75rem 1rem;margin-top:.75rem;font-size:.83rem}
+    input{background:#071e12;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Courier New',monospace;font-size:1rem;padding:.75rem 1rem;width:100%;outline:none;transition:border-color .2s}
+    input:focus{border-color:var(--green)}
+    input.shake{animation:shake .35s ease}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+    button{background:var(--green);color:#0A2A1B;font-family:'Courier New',monospace;font-size:.95rem;font-weight:bold;padding:.8rem 1.5rem;border:none;border-radius:8px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:.05em}
+    .error{color:var(--error);font-size:.82rem;margin-top:.4rem}
+
+    /* Revealed directions */
+    #directions{display:none}
+    @keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fade-up .5s ease forwards}
+
+    @keyframes border-pulse{
+      0%,100%{box-shadow:0 0 10px rgba(74,222,128,.3),0 0 20px rgba(74,222,128,.1)}
+      50%{box-shadow:0 0 20px rgba(74,222,128,.6),0 0 40px rgba(74,222,128,.25)}
+    }
+    .glow-card{border:2px solid var(--green);animation:border-pulse 2s ease-in-out infinite}
   </style>
 </head>
 <body>
@@ -45,7 +60,7 @@
     <img class="fairy" src="/assets/host_front.png" alt="Fairy" />
     <div>
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
-        <h1>Checkpoint 10</h1>
+        <p style="color:#4ADE80;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;font-weight:bold">Checkpoint 10</p>
         <span class="badge">FINAL TRIAL</span>
       </div>
       <p style="font-size:.78rem;color:var(--muted)">The jungle holds one last secret...</p>
@@ -75,20 +90,72 @@
 
     <hr class="sep" />
 
-    <p style="margin-bottom:.6rem">A song about a <strong>drink</strong>.<br/>
-    A drink that keeps you running through late nights and early mornings.</p>
+    <p style="margin-bottom:.6rem">A song about a <strong>drink</strong>.<br/>A drink that keeps you running through late nights and early mornings.</p>
 
     <div class="whisper">
       "Find where it's <span class="gold glow-gold">MADE</span> in this jungle.<br/>
       Another code awaits near the machine."
     </div>
 
-    <hr class="sep" />
-
-    <div class="hint-box">
+    <div style="background:#071e12;border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:.75rem 1rem;margin-top:.5rem;font-size:.83rem">
       💡 <span class="gold">HINT:</span> <span style="color:var(--muted)">Think Sabrina Carpenter. Think caffeine.</span>
     </div>
   </div>
+
+  <!-- Passphrase input -->
+  <div class="card" id="input-card">
+    <p class="muted" style="font-size:.82rem;margin-bottom:.6rem">The fairy waits. When you know the drink's battle cry, whisper it here...</p>
+    <input id="answer" type="text" placeholder="enter the phrase..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')check()" />
+    <p id="err" class="error"></p>
+    <button onclick="check()" style="margin-top:.6rem">Submit →</button>
+  </div>
+
+  <!-- Revealed directions (hidden until correct) -->
+  <div id="directions" class="card glow-card fade-up">
+    <p style="color:#4ADE80;font-weight:bold;font-size:.95rem;margin-bottom:.6rem">✨ The fairy grins. "You know your drinks."</p>
+    <hr class="sep" />
+    <p style="color:var(--muted);font-style:italic;font-size:.85rem;margin-bottom:.75rem">"Now... remember the eastern wall? Five flowers, top to bottom. You visited the very top — the shy purple bloom."</p>
+    <p style="margin-bottom:.5rem">Look <strong class="gold">ACROSS</strong> from there.</p>
+    <p style="color:var(--muted);font-style:italic;font-size:.85rem;line-height:1.7">Someone has been sitting at their desk far too long. A permanent employee. They never take breaks. They never go home.</p>
+    <p style="margin-top:.75rem;font-weight:bold">Find them. Scan them. <span style="color:#4ADE80">End this.</span></p>
+  </div>
+
+  <script>
+    const H = '563b1cfc8b15d2456747e24122524321f10093113c4bb35a5bea048ea0f54a6b'
+    let tries = 0
+
+    async function sha256(s) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))
+      return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('')
+    }
+
+    async function check() {
+      const inp = document.getElementById('answer')
+      const val = inp.value.trim()
+      if (!val) return
+
+      if (await sha256(val.toUpperCase()) === H) {
+        document.getElementById('input-card').style.display = 'none'
+        const dir = document.getElementById('directions')
+        dir.style.display = 'block'
+        dir.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } else {
+        tries++
+        inp.classList.remove('shake')
+        void inp.offsetWidth
+        inp.classList.add('shake')
+        inp.value = ''
+        inp.focus()
+        const hints = [
+          'Hmm... not quite. Think about what you order when you need energy.',
+          'The fairy shakes her head. It\'s a very specific phrase...',
+          'Getting warmer? The drink is just the start of the phrase.',
+          'The fairy hums the Sabrina Carpenter song again, meaningfully...',
+        ]
+        document.getElementById('err').textContent = hints[Math.min(tries - 1, hints.length - 1)]
+      }
+    }
+  </script>
 
 </body>
 </html>
