@@ -4,7 +4,6 @@ import { Dices, PartyPopper, Check } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { pickWinners } from '../lib/luckyDraw'
 
-const DRAW_COUNT = 5
 const SPIN_DURATION_MS = 600   // how long each slot spins before landing
 const SLOT_INTERVAL_MS = 1200  // gap between each slot landing
 const CORRECT_PIN = import.meta.env.VITE_LUCKY_DRAW_PIN ?? '1234'
@@ -75,6 +74,7 @@ export default function LuckyDraw() {
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState('')
   const [unlocked, setUnlocked] = useState(false)
+  const [drawCount, setDrawCount] = useState(3)
   const [drawing, setDrawing] = useState(false)
   const [winners, setWinners] = useState([])
   const [landedCount, setLandedCount] = useState(0)
@@ -116,7 +116,7 @@ export default function LuckyDraw() {
     if (drawn || drawing || eligible.length === 0) return
     drawTimeoutsRef.current.forEach(clearTimeout)
     drawTimeoutsRef.current = []
-    const picked = pickWinners(eligible, DRAW_COUNT)
+    const picked = pickWinners(eligible, drawCount)
     setWinners(picked)
     setDrawing(true)
     setLandedCount(0)
@@ -155,7 +155,7 @@ export default function LuckyDraw() {
         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Winners
         </p>
-        {Array.from({ length: loading ? DRAW_COUNT : Math.min(DRAW_COUNT, eligible.length) }).map((_, i) => (
+        {Array.from({ length: loading ? drawCount : Math.min(drawCount, eligible.length) }).map((_, i) => (
           <SlotReel
             key={i}
             eligibleNames={eligibleNames.length > 0 ? eligibleNames : ['—']}
@@ -181,16 +181,35 @@ export default function LuckyDraw() {
           <button type="submit" className="btn-secondary">Unlock Draw</button>
         </form>
       ) : (
-        <button
-          className="btn-primary"
-          onClick={handleDraw}
-          disabled={drawing || drawn || eligible.length === 0}
-        >
-          {drawn
-            ? <><PartyPopper size={15} strokeWidth={2} style={{ marginRight: 6 }} />Draw Complete</>
-            : drawing ? 'Drawing...'
-            : `Draw ${Math.min(DRAW_COUNT, eligible.length)} Winners`}
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          {!drawn && (
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <span>Number of winners</span>
+                <span style={{ fontWeight: 'bold', color: 'var(--green-glow)' }}>{Math.min(drawCount, eligible.length)}</span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={Math.max(1, eligible.length)}
+                value={drawCount}
+                onChange={e => setDrawCount(Number(e.target.value))}
+                disabled={drawing}
+                style={{ width: '100%', accentColor: 'var(--green-glow)' }}
+              />
+            </div>
+          )}
+          <button
+            className="btn-primary"
+            onClick={handleDraw}
+            disabled={drawing || drawn || eligible.length === 0}
+          >
+            {drawn
+              ? <><PartyPopper size={15} strokeWidth={2} style={{ marginRight: 6 }} />Draw Complete</>
+              : drawing ? 'Drawing...'
+              : `Draw ${Math.min(drawCount, eligible.length)} Winners`}
+          </button>
+        </div>
       )}
 
       {/* Eligible list */}
