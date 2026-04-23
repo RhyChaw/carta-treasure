@@ -113,33 +113,23 @@ export default function Game() {
       {locked && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 999,
-          background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', gap: '1.5rem',
-          padding: '2rem',
+          background: '#000', display: 'flex', flexDirection: 'column',
         }}>
-          <p style={{ fontSize: '2.5rem' }}>🧚</p>
-          <p style={{
-            color: '#4ADE80', fontFamily: "'Courier New', monospace",
-            fontSize: '1rem', textAlign: 'center', lineHeight: 1.6, maxWidth: 300,
-          }}>
-            The fairy is disappointed.<br />
-            <span style={{ color: '#fbbf24' }}>You fell for the trap.</span><br />
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Penalty: 30 seconds</span>
-          </p>
+          <iframe
+            src="https://www.youtube.com/embed/Aq5WXmQQooo?autoplay=1&controls=0&modestbranding=1"
+            allow="autoplay; fullscreen"
+            style={{ flex: 1, width: '100%', border: 'none' }}
+          />
           <div style={{
-            width: 110, height: 110, borderRadius: '50%',
-            border: '3px solid #ef4444',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#1a0a0a',
+            padding: '1rem', textAlign: 'center',
+            background: '#0a0a0a',
+            fontFamily: "'Courier New', monospace",
           }}>
-            <span style={{
-              fontSize: '3rem', fontFamily: "'Courier New', monospace",
-              fontWeight: 'bold', color: '#ef4444',
-            }}>{penalty}</span>
+            <p style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '0.2rem' }}>
+              The fairy is disappointed. Penalty: {penalty}s
+            </p>
+            <p style={{ color: '#555', fontSize: '0.75rem' }}>You fell for the trap. Get back to the real puzzle.</p>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic', textAlign: 'center' }}>
-            "Back to the real puzzle, explorer..."
-          </p>
         </div>
       )}
 
