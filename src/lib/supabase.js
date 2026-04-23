@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 function getPlayerId() {
   try {
-    const saved = sessionStorage.getItem('jungle_player')
+    const saved = localStorage.getItem('jungle_player')
     return saved ? JSON.parse(saved)?.id ?? '' : ''
   } catch {
     return ''
