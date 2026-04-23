@@ -90,7 +90,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
   const containerRef = useRef(null)
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
   const [userPos, setUserPos] = useState(null)
-  const [tapCoords, setTapCoords] = useState(null)
 
   useEffect(() => {
     const img = new Image()
@@ -130,13 +129,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
     return { bg: '#374151', label: '○', size: 16, active: false }
   }
 
-  function handleMapTap(e) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1)
-    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1)
-    setTapCoords({ x, y })
-  }
-
   return (
     <div
       ref={containerRef}
@@ -150,7 +142,7 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
         touchAction: 'pan-x pan-y',
       }}
     >
-      <div style={{ position: 'relative', width: imgSize.w || '100%', height: imgSize.h || 200 }} onClick={handleMapTap}>
+      <div style={{ position: 'relative', width: imgSize.w || '100%', height: imgSize.h || 200 }}>
         <img
           src="/assets/office.png"
           alt="Office Map"
@@ -175,7 +167,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
               }}
             >
               <div
-                title={showLabels ? roomId : undefined}
                 style={{
                   width: size,
                   height: size,
@@ -198,27 +189,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
             </div>
           )
         })}
-
-        {showLabels && tapCoords && (
-          <div style={{
-            position: 'absolute',
-            left: `${tapCoords.x}%`,
-            top: `${tapCoords.y}%`,
-            transform: 'translate(-50%, -120%)',
-            background: '#000',
-            color: '#4ADE80',
-            fontSize: 9,
-            padding: '2px 5px',
-            borderRadius: 4,
-            whiteSpace: 'nowrap',
-            fontFamily: 'monospace',
-            border: '1px solid #4ADE80',
-            pointerEvents: 'none',
-            zIndex: 30,
-          }}>
-            x:{tapCoords.x} y:{tapCoords.y}
-          </div>
-        )}
 
         {imgSize.w > 0 && userVisible && (
           <div
