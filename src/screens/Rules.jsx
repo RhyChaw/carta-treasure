@@ -9,8 +9,8 @@ const RULES = [
   },
   {
     Icon: Search,
-    title: 'Scan or type the room code',
-    body: 'At each room, find the QR code and scan it — or type the room code manually to unlock the challenge.',
+    title: 'Find the room phrase',
+    body: 'At each room, look for a printed card with a unique phrase. Type it into the app to unlock the challenge.',
   },
   {
     Icon: Puzzle,
