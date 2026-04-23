@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 // Only these rooms are game checkpoints — determines completed/active states
 const CHECKPOINT_ROOMS = new Set(['CLOVER', 'ASH', 'MAPLE', 'ORCHID', 'HICKORY', 'GLASGOW', 'IRIS', 'VIOLET', 'CHERRY', 'LIBRARY'])
@@ -87,21 +87,8 @@ function formatMs(ms) {
 }
 
 export default function MapView({ completedRooms = [], currentRoom, isStuck = false, remainingMs = 0 }) {
-  const containerRef = useRef(null)
-  const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
+  const [ready, setReady] = useState(false)
   const [userPos, setUserPos] = useState(null)
-
-  useEffect(() => {
-    const img = new Image()
-    img.onload = () => {
-      if (containerRef.current) {
-        const containerW = containerRef.current.offsetWidth
-        const scale = containerW / img.naturalWidth
-        setImgSize({ w: containerW, h: img.naturalHeight * scale })
-      }
-    }
-    img.src = '/assets/office.png'
-  }, [])
 
   useEffect(() => {
     if (!GPS_CALIBRATED || !TRANSFORM || !navigator.geolocation) return
@@ -131,7 +118,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
 
   return (
     <div
-      ref={containerRef}
       style={{
         position: 'relative',
         width: '100%',
@@ -142,14 +128,15 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
         touchAction: 'pan-x pan-y',
       }}
     >
-      <div style={{ position: 'relative', width: imgSize.w || '100%', height: imgSize.h || 200 }}>
+      <div style={{ position: 'relative' }}>
         <img
           src="/assets/office.png"
           alt="Office Map"
+          onLoad={() => setReady(true)}
           style={{ width: '100%', display: 'block' }}
         />
 
-        {imgSize.w > 0 && Object.entries(ROOM_PINS).map(([roomId, pin]) => {
+        {ready && Object.entries(ROOM_PINS).map(([roomId, pin]) => {
           const { bg, label, size, active } = getPinStyle(roomId)
           return (
             <div
@@ -190,7 +177,7 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
           )
         })}
 
-        {imgSize.w > 0 && userVisible && (
+        {ready && userVisible && (
           <div
             style={{
               position: 'absolute',
