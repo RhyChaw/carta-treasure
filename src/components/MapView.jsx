@@ -73,6 +73,8 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
   const containerRef = useRef(null)
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 })
   const [userPos, setUserPos] = useState(null)
+  const [showLabels, setShowLabels] = useState(false)
+  const [tapCoords, setTapCoords] = useState(null)
 
   useEffect(() => {
     const img = new Image()
@@ -115,6 +117,14 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
     return '○'
   }
 
+  function handleMapTap(e) {
+    if (!showLabels) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1)
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1)
+    setTapCoords({ x, y })
+  }
+
   return (
     <div
       ref={containerRef}
@@ -128,7 +138,7 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
         touchAction: 'pan-x pan-y',
       }}
     >
-      <div style={{ position: 'relative', width: imgSize.w || '100%', height: imgSize.h || 200 }}>
+      <div style={{ position: 'relative', width: imgSize.w || '100%', height: imgSize.h || 200 }} onClick={handleMapTap}>
         <img
           src="/assets/office.png"
           alt="Office Map"
@@ -140,37 +150,54 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
           if (!pin) return null
           const isActive = roomId === currentRoom && currentRevealed
           return (
-            <div
-              key={roomId}
-              title={isActive ? roomId : undefined}
-              style={{
-                position: 'absolute',
-                left: `${pin.x}%`,
-                top: `${pin.y}%`,
-                transform: 'translate(-50%, -50%)',
-                width: isActive ? 28 : 18,
-                height: isActive ? 28 : 18,
-                borderRadius: '50%',
-                background: getPinColor(roomId),
-                border: `${isActive ? 3 : 2}px solid ${isActive ? '#fff' : 'rgba(0,0,0,0.4)'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: isActive ? 10 : 8,
-                color: '#0A2A1B',
-                fontWeight: 'bold',
-                cursor: 'default',
-                animation: isActive ? 'pulse-glow 2s ease-in-out infinite' : 'none',
-                zIndex: isActive ? 2 : 1,
-                boxShadow: isActive
-                  ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24'
-                  : 'none',
-              }}
-            >
-              {getPinLabel(roomId)}
+            <div key={roomId} style={{ position: 'absolute', left: `${pin.x}%`, top: `${pin.y}%`, transform: 'translate(-50%, -50%)', zIndex: isActive ? 2 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <div
+                title={roomId}
+                style={{
+                  width: isActive ? 28 : 18,
+                  height: isActive ? 28 : 18,
+                  borderRadius: '50%',
+                  background: getPinColor(roomId),
+                  border: `${isActive ? 3 : 2}px solid ${isActive ? '#fff' : 'rgba(0,0,0,0.4)'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: isActive ? 10 : 8,
+                  color: '#0A2A1B',
+                  fontWeight: 'bold',
+                  cursor: 'default',
+                  animation: isActive ? 'pulse-glow 2s ease-in-out infinite' : 'none',
+                  boxShadow: isActive
+                    ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24'
+                    : 'none',
+                }}
+              >
+                {getPinLabel(roomId)}
+              </div>
+              {showLabels && (
+                <span style={{
+                  background: 'rgba(0,0,0,0.75)', color: '#fff',
+                  fontSize: 8, padding: '1px 3px', borderRadius: 3,
+                  whiteSpace: 'nowrap', fontFamily: 'monospace', letterSpacing: '0.03em',
+                  pointerEvents: 'none',
+                }}>
+                  {roomId}
+                </span>
+              )}
             </div>
           )
         })}
+        {showLabels && tapCoords && (
+          <div style={{
+            position: 'absolute', left: `${tapCoords.x}%`, top: `${tapCoords.y}%`,
+            transform: 'translate(-50%, -120%)',
+            background: '#000', color: '#4ADE80', fontSize: 9,
+            padding: '2px 5px', borderRadius: 4, whiteSpace: 'nowrap',
+            fontFamily: 'monospace', border: '1px solid #4ADE80', pointerEvents: 'none', zIndex: 30,
+          }}>
+            x:{tapCoords.x} y:{tapCoords.y}
+          </div>
+        )}
 
         {/* "You are here" dot — only renders once GPS_REFS are filled in */}
         {imgSize.w > 0 && userVisible && (
@@ -208,12 +235,23 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <span style={{ color: '#4ADE80' }}>● Completed</span>
         {currentRevealed && <span style={{ color: '#FBBF24' }}>● Current Target</span>}
         <span style={{ color: '#374151' }}>● Undiscovered</span>
         {GPS_CALIBRATED && <span style={{ color: '#3B82F6' }}>● You</span>}
+        <button
+          onClick={() => { setShowLabels(s => !s); setTapCoords(null) }}
+          style={{ marginLeft: 'auto', background: 'none', border: '1px solid var(--border)', color: showLabels ? '#4ADE80' : 'var(--text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, cursor: 'pointer', fontFamily: 'monospace' }}
+        >
+          {showLabels ? 'labels on' : 'labels off'}
+        </button>
       </div>
+      {showLabels && tapCoords && (
+        <div style={{ padding: '0 0.75rem 0.5rem', fontSize: '0.72rem', color: '#4ADE80', fontFamily: 'monospace' }}>
+          tapped → x:{tapCoords.x}% y:{tapCoords.y}%
+        </div>
+      )}
 
       {currentRoom && !currentRevealed && remainingMs > 0 && (
         <div style={{
