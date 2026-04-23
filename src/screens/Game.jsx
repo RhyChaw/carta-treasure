@@ -18,6 +18,7 @@ export default function Game() {
   const [roomError, setRoomError] = useState('')
   const [penalty, setPenalty] = useState(0)
   const penaltyRef = useRef(null)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     if (!player) navigate('/')
@@ -84,6 +85,20 @@ export default function Game() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function pushProgress() {
+    setSyncing(true)
+    const { error } = await supabase
+      .from('players')
+      .update({ current_step: player.current_step })
+      .eq('id', player.id)
+    setSyncing(false)
+    if (error) {
+      showToast('Sync failed: ' + error.message, 'error')
+    } else {
+      showToast('Progress synced to leaderboard!', 'success')
     }
   }
 
@@ -176,6 +191,19 @@ export default function Game() {
             ))}
           </div>
         )}
+
+        <button
+          onClick={pushProgress}
+          disabled={syncing}
+          style={{
+            background: 'none', border: '1px solid var(--border)',
+            color: 'var(--text-muted)', fontSize: '0.72rem',
+            padding: '0.4rem 0.9rem', borderRadius: 6, cursor: 'pointer',
+            fontFamily: "'Courier New', monospace", alignSelf: 'flex-start',
+          }}
+        >
+          {syncing ? 'Syncing...' : 'Push Progress →'}
+        </button>
       </div>
     </>
   )
