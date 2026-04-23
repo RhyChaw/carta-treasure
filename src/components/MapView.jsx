@@ -1,34 +1,51 @@
 import { useRef, useState, useEffect } from 'react'
 
-const CHECKPOINT_ROOMS = ['CLOVER', 'ASH', 'MAPLE', 'ORCHID', 'HICKORY', 'GLASGOW', 'IRIS', 'VIOLET', 'CHERRY', 'LIBRARY']
+// Only these rooms are game checkpoints — determines completed/active states
+const CHECKPOINT_ROOMS = new Set(['CLOVER', 'ASH', 'MAPLE', 'ORCHID', 'HICKORY', 'GLASGOW', 'IRIS', 'VIOLET', 'CHERRY', 'LIBRARY'])
 
+// All rooms shown on the map (checkpoints + decoys)
 const ROOM_PINS = {
-  GLASGOW:    { x: 4.5,  y: 4   },
-  MAPLE:      { x: 44,   y: 14  },
-  ASH:        { x: 71.5, y: 12  },
-  VIOLET:     { x: 84,   y: 7   },
-  ORCHID:     { x: 84.5, y: 38  },
-  HICKORY:    { x: 71.5, y: 40  },
-  CHERRY:     { x: 71.5, y: 27  },
-  CLOVER:     { x: 46,   y: 37  },
-  IRIS:       { x: 68.5, y: 52  },
-  LIBRARY:    { x: 64,   y: 49  },
+  // ── Checkpoint rooms ──────────────────────────────
+  GLASGOW:    { x: 4.3,  y: 14.3 },
+  MAPLE:      { x: 42.7, y: 24.1 },
+  ASH:        { x: 71.5, y: 12.0 },
+  VIOLET:     { x: 82.5, y: 13.3 },
+  TRILLIUM:   { x: 81.7, y: 23.1 },
+  CHERRY:     { x: 71.5, y: 27.0 },
+  ORCHID:     { x: 81.9, y: 49.4 },
+  HICKORY:    { x: 71.5, y: 40.0 },
+  POPPY:      { x: 81.7, y: 39.1 },
+  PINE:       { x: 55.0, y: 35.3 },
+  CLOVER:     { x: 44.1, y: 48.9 },
+  WALNUT:     { x: 55.0, y: 45.5 },
+  IRIS:       { x: 67.3, y: 64.5 },
+  LIBRARY:    { x: 62.0, y: 64.9 },
+  LILY:       { x: 71.4, y: 64.9 },
+  MAYFLOWER:  { x: 75.5, y: 66.9 },
+  // ── Decoy rooms ───────────────────────────────────
+  KITCHEN:    { x: 31.0, y: 11.9 },
+  GYM:        { x: 52.6, y: 9.9  },
+  WEBER:      { x: 10.5, y: 9.9  },
+  OAK:        { x: 11.5, y: 15.5 },
+  BUNCHBERRY: { x: 40.0, y: 46.9 },
+  DANDELION:  { x: 48.2, y: 47.9 },
+  ROSE:       { x: 82.3, y: 23.8 },
+  CABIN:      { x: 92.6, y: 86.4 },
 }
 
 // ─────────────────────────────────────────────
 // GPS CALIBRATION — update these if re-calibrating
 // ─────────────────────────────────────────────
 const GPS_REFS = [
-  { lat: 43.4500889, lng: -80.5129959, xPct: ROOM_PINS.GLASGOW.x,  yPct: ROOM_PINS.GLASGOW.y  },  // GLASGOW
-  { lat: 43.4503131, lng: -80.5123552, xPct: ROOM_PINS.VIOLET.x,   yPct: ROOM_PINS.VIOLET.y   },  // VIOLET
-  { lat: 43.4501729, lng: -80.5125219, xPct: ROOM_PINS.LIBRARY.x,  yPct: ROOM_PINS.LIBRARY.y  },  // LIBRARY
+  { lat: 43.4500889, lng: -80.5129959, xPct: ROOM_PINS.GLASGOW.x,  yPct: ROOM_PINS.GLASGOW.y  },
+  { lat: 43.4503131, lng: -80.5123552, xPct: ROOM_PINS.VIOLET.x,   yPct: ROOM_PINS.VIOLET.y   },
+  { lat: 43.4501729, lng: -80.5125219, xPct: ROOM_PINS.LIBRARY.x,  yPct: ROOM_PINS.LIBRARY.y  },
 ]
 // ─────────────────────────────────────────────
 
 const GPS_CALIBRATED = GPS_REFS.every(r => r.lat !== null && r.lng !== null)
 
 function buildTransform(refs) {
-  // Normalize to small numbers around origin to avoid floating-point drift
   const latO = refs[0].lat
   const lngO = refs[0].lng
   const pts = refs.map(r => ({ dLat: r.lat - latO, dLng: r.lng - lngO, xPct: r.xPct, yPct: r.yPct }))
@@ -102,19 +119,16 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
   const userVisible = userMapPos && userMapPos.xPct >= 0 && userMapPos.xPct <= 100 && userMapPos.yPct >= 0 && userMapPos.yPct <= 100
   const outsideOffice = userPos && TRANSFORM && !userVisible
 
-  // Current room is only "revealed" after the 5-min timer fires
   const currentRevealed = isStuck
 
-  function getPinColor(roomId) {
-    if (completedRooms.includes(roomId)) return '#4ADE80'
-    if (roomId === currentRoom && currentRevealed) return '#FBBF24'
-    return '#374151'
-  }
+  function getPinStyle(roomId) {
+    const isCheckpoint = CHECKPOINT_ROOMS.has(roomId)
+    const isCompleted = completedRooms.includes(roomId)
+    const isActive = isCheckpoint && roomId === currentRoom && currentRevealed
 
-  function getPinLabel(roomId) {
-    if (completedRooms.includes(roomId)) return '✓'
-    if (roomId === currentRoom && currentRevealed) return '●'
-    return '○'
+    if (isCompleted) return { bg: '#4ADE80', label: '✓', size: 18, active: false }
+    if (isActive)    return { bg: '#FBBF24', label: '●', size: 28, active: true }
+    return { bg: '#374151', label: '○', size: 16, active: false }
   }
 
   function handleMapTap(e) {
@@ -145,40 +159,53 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
           style={{ width: '100%', display: 'block' }}
         />
 
-        {imgSize.w > 0 && CHECKPOINT_ROOMS.map(roomId => {
-          const pin = ROOM_PINS[roomId]
-          if (!pin) return null
-          const isActive = roomId === currentRoom && currentRevealed
+        {imgSize.w > 0 && Object.entries(ROOM_PINS).map(([roomId, pin]) => {
+          const { bg, label, size, active } = getPinStyle(roomId)
           return (
-            <div key={roomId} style={{ position: 'absolute', left: `${pin.x}%`, top: `${pin.y}%`, transform: 'translate(-50%, -50%)', zIndex: isActive ? 2 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <div
+              key={roomId}
+              style={{
+                position: 'absolute',
+                left: `${pin.x}%`,
+                top: `${pin.y}%`,
+                transform: 'translate(-50%, -50%)',
+                zIndex: active ? 2 : 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
               <div
-                title={roomId}
+                title={showLabels ? roomId : undefined}
                 style={{
-                  width: isActive ? 28 : 18,
-                  height: isActive ? 28 : 18,
+                  width: size,
+                  height: size,
                   borderRadius: '50%',
-                  background: getPinColor(roomId),
-                  border: `${isActive ? 3 : 2}px solid ${isActive ? '#fff' : 'rgba(0,0,0,0.4)'}`,
+                  background: bg,
+                  border: `${active ? 3 : 2}px solid ${active ? '#fff' : 'rgba(0,0,0,0.4)'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: isActive ? 10 : 8,
+                  fontSize: active ? 10 : 8,
                   color: '#0A2A1B',
                   fontWeight: 'bold',
                   cursor: 'default',
-                  animation: isActive ? 'pulse-glow 2s ease-in-out infinite' : 'none',
-                  boxShadow: isActive
-                    ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24'
-                    : 'none',
+                  animation: active ? 'pulse-glow 2s ease-in-out infinite' : 'none',
+                  boxShadow: active ? '0 0 0 6px rgba(251,191,36,0.35), 0 0 16px #FBBF24' : 'none',
                 }}
               >
-                {getPinLabel(roomId)}
+                {label}
               </div>
               {showLabels && (
                 <span style={{
-                  background: 'rgba(0,0,0,0.75)', color: '#fff',
-                  fontSize: 8, padding: '1px 3px', borderRadius: 3,
-                  whiteSpace: 'nowrap', fontFamily: 'monospace', letterSpacing: '0.03em',
+                  background: 'rgba(0,0,0,0.8)',
+                  color: CHECKPOINT_ROOMS.has(roomId) ? '#4ADE80' : '#9ca3af',
+                  fontSize: 8,
+                  padding: '1px 3px',
+                  borderRadius: 3,
+                  whiteSpace: 'nowrap',
+                  fontFamily: 'monospace',
                   pointerEvents: 'none',
                 }}>
                   {roomId}
@@ -187,19 +214,28 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
             </div>
           )
         })}
+
         {showLabels && tapCoords && (
           <div style={{
-            position: 'absolute', left: `${tapCoords.x}%`, top: `${tapCoords.y}%`,
+            position: 'absolute',
+            left: `${tapCoords.x}%`,
+            top: `${tapCoords.y}%`,
             transform: 'translate(-50%, -120%)',
-            background: '#000', color: '#4ADE80', fontSize: 9,
-            padding: '2px 5px', borderRadius: 4, whiteSpace: 'nowrap',
-            fontFamily: 'monospace', border: '1px solid #4ADE80', pointerEvents: 'none', zIndex: 30,
+            background: '#000',
+            color: '#4ADE80',
+            fontSize: 9,
+            padding: '2px 5px',
+            borderRadius: 4,
+            whiteSpace: 'nowrap',
+            fontFamily: 'monospace',
+            border: '1px solid #4ADE80',
+            pointerEvents: 'none',
+            zIndex: 30,
           }}>
             x:{tapCoords.x} y:{tapCoords.y}
           </div>
         )}
 
-        {/* "You are here" dot — only renders once GPS_REFS are filled in */}
         {imgSize.w > 0 && userVisible && (
           <div
             style={{
@@ -210,7 +246,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
               zIndex: 20,
             }}
           >
-            {/* Accuracy ring */}
             <div style={{
               position: 'absolute',
               inset: '50%',
@@ -221,7 +256,6 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
               background: 'rgba(59, 130, 246, 0.15)',
               border: '1px solid rgba(59,130,246,0.35)',
             }} />
-            {/* Blue dot */}
             <div style={{
               position: 'relative',
               width: 14,
@@ -238,15 +272,26 @@ export default function MapView({ completedRooms = [], currentRoom, isStuck = fa
       <div style={{ display: 'flex', gap: '1rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <span style={{ color: '#4ADE80' }}>● Completed</span>
         {currentRevealed && <span style={{ color: '#FBBF24' }}>● Current Target</span>}
-        <span style={{ color: '#374151' }}>● Undiscovered</span>
+        <span style={{ color: '#374151' }}>● Room</span>
         {GPS_CALIBRATED && <span style={{ color: '#3B82F6' }}>● You</span>}
         <button
           onClick={() => { setShowLabels(s => !s); setTapCoords(null) }}
-          style={{ marginLeft: 'auto', background: 'none', border: '1px solid var(--border)', color: showLabels ? '#4ADE80' : 'var(--text-muted)', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, cursor: 'pointer', fontFamily: 'monospace' }}
+          style={{
+            marginLeft: 'auto',
+            background: 'none',
+            border: '1px solid var(--border)',
+            color: showLabels ? '#4ADE80' : 'var(--text-muted)',
+            fontSize: '0.7rem',
+            padding: '2px 8px',
+            borderRadius: 4,
+            cursor: 'pointer',
+            fontFamily: 'monospace',
+          }}
         >
           {showLabels ? 'labels on' : 'labels off'}
         </button>
       </div>
+
       {showLabels && tapCoords && (
         <div style={{ padding: '0 0.75rem 0.5rem', fontSize: '0.72rem', color: '#4ADE80', fontFamily: 'monospace' }}>
           tapped → x:{tapCoords.x}% y:{tapCoords.y}%
